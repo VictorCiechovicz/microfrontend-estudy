@@ -223,6 +223,9 @@ importers:
 
   apps/account:
     dependencies:
+      '@lab/cache-sync':
+        specifier: workspace:*
+        version: link:../../packages/cache-sync
       next:
         specifier: 16.4.3
         version: 16.4.3(@playwright/test@1.64.1)(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -251,6 +254,9 @@ importers:
 
   apps/catalog:
     dependencies:
+      '@lab/cache-sync':
+        specifier: workspace:*
+        version: link:../../packages/cache-sync
       '@lab/mf-host':
         specifier: workspace:*
         version: link:../../packages/mf-host
@@ -282,6 +288,9 @@ importers:
 
   apps/shell:
     dependencies:
+      '@lab/cache-sync':
+        specifier: workspace:*
+        version: link:../../packages/cache-sync
       next:
         specifier: 16.4.3
         version: 16.4.3(@playwright/test@1.64.1)(@types/node@26.6.5)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -338,6 +347,21 @@ importers:
       typescript:
         specifier: 7.0.2
         version: 7.0.2
+
+  packages/cache-sync:
+    devDependencies:
+      '@lab/tsconfig':
+        specifier: workspace:*
+        version: link:../tsconfig
+      '@types/node':
+        specifier: 26.6.5
+        version: 26.6.5
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+      vitest:
+        specifier: 5.0.5
+        version: 5.0.5(@types/node@26.6.5)(vite@8.3.5(@types/node@26.6.5)(jiti@2.4.2))
 
   packages/db:
     devDependencies:

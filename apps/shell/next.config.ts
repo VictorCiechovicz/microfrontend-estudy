@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { ACCOUNT_URL, CATALOG_URL } from "./lib/zone-urls";
 
 const nextConfig: NextConfig = {
+  transpilePackages: ["@lab/cache-sync"],
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {

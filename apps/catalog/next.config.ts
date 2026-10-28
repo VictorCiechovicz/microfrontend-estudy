@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   assetPrefix: "/catalog-static",
-  transpilePackages: ["@lab/mf-host"],
+  transpilePackages: ["@lab/cache-sync", "@lab/mf-host"],
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {
