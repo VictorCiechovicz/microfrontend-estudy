@@ -1,0 +1,23 @@
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(.slide) {
+    animation: slide-out 200ms ease-in both;
+  }
+
+  ::view-transition-new(.slide) {
+    animation: slide-in 300ms ease-out both;
+  }
+}
+
+@keyframes slide-out {
+  to {
+    opacity: 0;
+    translate: -60px;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    translate: 60px;
+  }
+}

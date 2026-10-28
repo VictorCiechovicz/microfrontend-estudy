@@ -15,7 +15,7 @@ export function ReviewsJump({
   const reviewsRef = useRef<FragmentInstance>(null);
   function jumpToReviews() {
     reviewsRef.current?.scrollIntoView();
-    reviewsRef.current?.focus();
+    reviewsRef.current?.focus({ preventScroll: true });
   }
   return (
     <>

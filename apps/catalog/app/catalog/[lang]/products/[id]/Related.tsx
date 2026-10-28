@@ -1,10 +1,8 @@
-import { prefetch } from "next/cache";
 import Link from "next/link";
 import { getRelatedProducts } from "../../../../../lib/data";
 import { currentLang } from "../../../../../lib/i18n";
 
 export async function Related({ id }: { id: number }) {
-  await prefetch();
   const lang = await currentLang();
   const products = await getRelatedProducts(id);
   return (

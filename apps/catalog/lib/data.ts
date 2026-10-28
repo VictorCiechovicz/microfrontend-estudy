@@ -40,3 +40,10 @@ export async function getRelatedProducts(id: number): Promise<Product[]> {
   cacheLife("hours");
   return withLatency(() => getRecommendations(id));
 }
+
+export async function getPopularProducts(): Promise<Product[]> {
+  "use cache";
+  cacheTag(tags.products());
+  cacheLife("hours");
+  return withLatency(() => getRecommendations(undefined, 3));
+}

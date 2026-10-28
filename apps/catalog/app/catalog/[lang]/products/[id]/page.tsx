@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
 import { getProductDetail } from "../../../../../lib/data";
 import { currentLang, t } from "../../../../../lib/i18n";
+import { SlideTransition } from "../../SlideTransition";
+import { Popular } from "./Popular";
 import { Related } from "./Related";
 import { Reviews } from "./Reviews";
 import { ReviewsJump } from "./ReviewsJump";
@@ -21,9 +23,16 @@ type Params = Promise<{ lang: string; id: string }>;
 
 export default function ProductPage({ params }: { params: Params }) {
   return (
-    <Suspense fallback={<main aria-busy="true" />}>
-      <Product params={params} />
-    </Suspense>
+    <SlideTransition>
+      <main>
+        <Suspense fallback={<p aria-busy="true">…</p>}>
+          <Product params={params} />
+        </Suspense>
+        <Suspense fallback={<p>Loading popular…</p>}>
+          <Popular />
+        </Suspense>
+      </main>
+    </SlideTransition>
   );
 }
 
@@ -33,7 +42,7 @@ async function Product({ params }: { params: Params }) {
   if (!product) notFound();
   const lang = await currentLang();
   return (
-    <main>
+    <>
       <ViewTransition name={`product-${product.id}`}>
         <h1>{product.name}</h1>
       </ViewTransition>
@@ -59,6 +68,6 @@ async function Product({ params }: { params: Params }) {
           <Related id={product.id} />
         </Suspense>
       </ReviewsJump>
-    </main>
+    </>
   );
 }

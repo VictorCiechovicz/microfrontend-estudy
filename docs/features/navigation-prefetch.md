@@ -13,19 +13,37 @@ Nos dois casos, o fallback do `<Suspense>` mais próximo é o que aparece na eta
 
 As duas funções são do Next 16.4.0 (antes eram `unstable_prefetch`/`unstable_navigation` no canary). Assinatura no 16.4.3: `function navigation(): Promise<void>` e `function prefetch(): Promise<void>`, sem parâmetros. Lançam erro dentro de `'use cache'`, de `after()`, de `generateStaticParams` ou de Client Component.
 
-## Onde no código
+## `prefetch()`: bloco "Popular" na página de produto
 
-- `apps/catalog/app/catalog/[lang]/products/[id]/Related.tsx`: `await prefetch()` e depois `getRelatedProducts(id)` (`'use cache'`, tag `products`, `cacheLife('hours')`, em `apps/catalog/lib/data.ts`, por cima de `getRecommendations` do `@lab/db`). Os nomes vêm em inglês porque `getRecommendations` lê a tradução `en`. Fallback: "Loading related…".
-- `apps/catalog/app/catalog/[lang]/products/[id]/Reviews.tsx`: `await navigation()` e depois `listReviews(id)` sem cache (com a latência artificial de `withLatency`). Fallback: `t('loadingReviews')` ("Carregando avaliações…"). Cada avaliação tem `data-testid="review"`.
-- `apps/catalog/app/components/UserSlot.tsx` já usava `navigation()` desde a Task 8 (cookie de sessão fora do shell e do prefetch).
+`apps/catalog/app/catalog/[lang]/products/[id]/Popular.tsx` faz `await prefetch()` e depois `getPopularProducts()` (`'use cache'`, tag `products`, `cacheLife('hours')`, em `apps/catalog/lib/data.ts`, por cima de `getRecommendations(undefined, 3)`). Fica em `page.tsx` ao lado do `<Suspense>` do produto, com fallback "Loading popular…".
 
-## Por que as avaliações ficaram sem `'use cache'`
+O bloco não lê `params` nem cookie e o dado é cacheado: sem o `prefetch()` ele entraria no App Shell da rota. Com o `prefetch()`:
 
-A doc sugere `navigation()` + uma função `'use cache'` abaixo dela. Aqui isso não serve para os ids 1–3: a doc avisa que "static prerenders still include the content", ou seja, o prerender do build atravessa o `navigation()`, cacheia as avaliações e elas passam a vir no prefetch estático, que é exatamente o que este exemplo quer evitar. Com a leitura sem cache, o prerender para no `setTimeout` do `withLatency` e as avaliações viram um buraco que só a navegação preenche, inclusive para os ids pré-renderizados. Já `Related` quer o contrário (entrar no prefetch por link), por isso usa cache.
+- Um `<Link>` comum (os links de "Related") carrega só o App Shell: no instante do clique aparece "Loading popular…".
+- Um `<Link prefetch>` (a lista do catálogo) carrega também o prefetch por link: "Popular" já aparece pronto.
+
+A primeira versão desta tarefa punha o `prefetch()` em `Related`. Lá ele não fazia nada: "Related" depende do `id` da URL, e conteúdo atrás de `params` já fica fora do App Shell por conta própria (a doc instalada diz isso). `Related.tsx` agora não chama `prefetch()`; continua no prefetch por link porque o dado é cacheado e o `id` é conhecido nessa etapa.
+
+Detalhe observado no build de produção: o App Shell de um id que não está em `generateStaticParams` só sai sem "Popular" depois que o Next promove a página desse id (ISR, ver `isr-shell.md`). Na primeira vez, a resposta do prefetch é o "fallback shell" estático da rota (`x-nextjs-cache: MISS`, ≈ 5,6 KB), e esse prerender inclui o "Popular". O teste por isso visita o destino antes e espera o arquivo aparecer em `route-cache`.
+
+## `navigation()`: não tem efeito observável neste lab
+
+`apps/catalog/app/catalog/[lang]/products/[id]/Reviews.tsx` faz `await navigation()` como o brief pede, seguido da leitura sem cache das avaliações (`listReviews` com `withLatency`). Fallback: `t('loadingReviews')`, cada avaliação com `data-testid="review"`.
+
+Neste lab o `navigation()` não muda nada que se possa ver, e isso foi medido:
+
+1. **Avaliações sem cache, sem `navigation()`.** Os 7 testes de `e2e/instant.spec.ts` passam do mesmo jeito. Quem tira as avaliações do prefetch é a leitura sem cache: o prerender para no `setTimeout` do `withLatency`.
+2. **Avaliações com `'use cache'` (tag `product:<id>`), com e sem `navigation()`.** Nos dois casos as avaliações chegam junto com o prefetch por link, tanto em `products/2` (em `generateStaticParams`) quanto em `products/5` (gerado por ISR): a resposta `__PAGE__` (`x-nextjs-cache: HIT`, ≈ 8,5 KB) contém "Review 1 of product …" e, dentro do `instant()`, as avaliações aparecem e o "Carregando avaliações…" não.
+
+O motivo está na doc instalada: "Static prerenders still include the content in their output, so it can appear in a static prefetch". Com `ensureStatic = 'prefetch'` no layout raiz, todo prefetch por link vem de saída estática (o lab confirma: `x-nextjs-prerender: 1` em todas as respostas). O `navigation()` só tira conteúdo de um prefetch **renderizado em tempo de execução**, e essa configuração não deixa existir nenhum. Pela mesma razão, o `navigation()` do `UserSlot` (Task 8) também não muda nada: o `ensureStatic = 'prefetch'` já empurra o cookie para a etapa de navegação ("Setting 'prefetch' enforces that stage boundary across the route without adding await navigation()", doc de `ensureStatic`).
+
+Ver o efeito do `navigation()` exigiria uma rota sem `ensureStatic = 'prefetch'`. Como o `false` é proibido abaixo de um layout com `'prefetch'`, isso significa mudar o layout raiz do catálogo, o que fica fora desta tarefa.
 
 ## Como observar
 
-1. `pnpm prod`, abra `http://localhost:3000/catalog/pt`, espere a lista carregar e clique em "Produto 2": título, preço e "Related" aparecem na hora; "Carregando avaliações…" fica uns 400 ms até as avaliações chegarem.
-2. Na aba Network, a resposta `__PAGE__` do prefetch de `products/2` contém "Product 12" (Related) e não contém "Review 1 of product 2" (ver `partial-prefetching.md`).
-3. A partir de "Related", os links são `<Link>` comuns (só App Shell). Clicar num deles mostra primeiro o fallback da página e depois o produto.
-4. `e2e/instant.spec.ts` › "product title is instant, reviews stream after navigation" e "related products link to other product pages".
+1. `pnpm prod` e abra `http://localhost:3000/catalog/pt/products/2`. Clique num link de "Related": a página nova mostra "…" e "Loading popular…" até o conteúdo chegar.
+2. Volte a `/catalog/pt` e clique em "Produto 3" (link com `prefetch`): título, preço, "Related" e "Popular" aparecem na hora; só as avaliações ficam em "Carregando avaliações…".
+3. `e2e/instant.spec.ts`:
+   - "product title is instant, reviews stream after navigation": "Popular" já vem pronto pelo prefetch por link.
+   - "popular block is out of the App Shell a default link loads": com só o App Shell, aparece o "Loading popular…" e a região "Popular" não existe.
+   - Tirar o `await prefetch()` de `Popular.tsx` faz este último falhar ("Loading popular…" não aparece).

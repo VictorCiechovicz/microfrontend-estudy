@@ -17,6 +17,7 @@ Disponível no Turbopack do Next 16.4.3 (não existe com webpack). Os tipos vêm
 - `apps/catalog/lib/guides.ts`: `import.meta.glob<{ default: string }>('../content/guides/*.md', { eager: true, query: '?raw' })`, mais `guides` (lista) e `getGuide(slug)`.
 - `apps/catalog/app/catalog/[lang]/guides/page.tsx`: lista os guias com `<Link>` para `/catalog/<lang>/guides/<slug>`. O `<h1>` continua "Guides" (o `zones.spec` depende dele).
 - `apps/catalog/app/catalog/[lang]/guides/[slug]/page.tsx`: `generateStaticParams` a partir de `guides`; `notFound()` para slug desconhecido.
+- `apps/catalog/proxy.ts`: também casa `/catalog/:lang/guides/:slug` e reescreve para `/catalog/<lang>/_missing` quando `getGuide(slug)` não acha o guia. Sem isso, `/catalog/pt/guides/nope` respondia `200` (o `notFound()` dentro de `<Suspense>` chega depois do shell já enviado, o mesmo problema descrito em `isr-shell.md`). O proxy usa o mesmo `lib/guides.ts`, então o glob também roda no bundle do proxy.
 
 ## Desvios do brief
 
@@ -27,4 +28,5 @@ Disponível no Turbopack do Next 16.4.3 (não existe com webpack). Os tipos vêm
 
 1. `pnpm prod` e abra `http://localhost:3000/catalog/pt/guides`: três itens, na ordem das chaves do glob (`caring-for-your-order`, `choosing-a-product`, `returns`).
 2. Crie `apps/catalog/content/guides/zz-test.md` com `# Teste` e rode `pnpm --filter catalog dev`: o item novo aparece sem mudar código. Apague depois.
-3. `e2e/instant.spec.ts` › "guides list comes from markdown files".
+3. `curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/catalog/pt/guides/nope` → `404`.
+4. `e2e/instant.spec.ts` › "guides list comes from markdown files" (abre o primeiro guia e confere o título "Caring for your order") e "unknown guide is 404".

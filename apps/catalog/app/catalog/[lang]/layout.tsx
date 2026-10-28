@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
 import { currentLang } from "../../../lib/i18n";
 import { UserSlot } from "../../components/UserSlot";
+import "./view-transitions.css";
 
 export const ensureStatic = "prefetch";
 
