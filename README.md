@@ -22,6 +22,16 @@ pnpm lint          # Biome
 
 Abra `http://localhost:3000`. Nunca acesse as zonas pelas portas 3001/3002 no dia a dia: o shell é a porta de entrada.
 
+### Como estudar pelo app
+
+O próprio app ensina o que está acontecendo, em português:
+
+- **Roteiro de estudo** (`/#roteiro`, na home do shell): seis passos, cada um com objetivo, o que fazer, o que observar, um link para o lugar no app e a nota correspondente.
+- **Modo estudo** (botão no canto inferior direito, nas três zonas): painel com a zona que serviu a página e como a requisição chegou lá (rewrite do shell, `assetPrefix` ou `basePath`), a hora do documento e o contador de navegações suaves (zera numa navegação dura entre zonas), os widgets de Module Federation da página e as notas dela. Ligado, cada widget federado ganha contorno roxo tracejado. O estado fica em `localStorage`, compartilhado porque as zonas têm a mesma origem.
+- **"O que observar aqui"**: bloco recolhível nas páginas-chave (home, catálogo, produto, guias, admin, laboratório de erros, login, conta, pedidos, perfil, notificações).
+- **Aviso de cache**: pedido, preço, perfil, notificação lida e carrinho mostram as invalidações feitas na zona (`updateTag`, `revalidateTag`, `refresh()`) e o resultado do broadcast para cada zona (✓/✗ com o erro).
+- **Notas no app** (`/estudo`): as notas de `docs/features/` renderizadas pelo shell (`import.meta.glob` + `marked` 18.0.10), com links entre notas funcionando.
+
 ### Variáveis de ambiente
 
 Para sobrescrever um valor, exporte a variável no shell: `LAB_LATENCY_MS=2000 pnpm dev`. O Turbo roda em modo estrito, então só repassa as variáveis declaradas em `turbo.json`: `LAB_INTERNAL_SECRET`, `LAB_LATENCY_MS`, `LAB_DB_PATH` e `SHELL_URL` (todas as tarefas), e `CATALOG_URL`, `ACCOUNT_URL` e `NEXT_PUBLIC_WIDGETS_URL` (no `build`, onde são embutidas; no `dev`/`start`, repassadas). O `.env.example` da raiz é só uma lista dos nomes e dos valores padrão: nem o Turbo nem o Next o leem. Um `.env` só valeria dentro de cada app (`apps/<app>/.env`), lido pelo Next daquela app, e as variáveis lidas pelo `@lab/db` ainda assim precisariam estar no ambiente.
