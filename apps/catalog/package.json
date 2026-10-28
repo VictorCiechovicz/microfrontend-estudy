@@ -6,8 +6,8 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "dev:inspect": "next dev -p 3001 --inspect",
-    "start:inspect": "next start -p 3001 --inspect",
+    "dev:inspect": "next dev -p 3001 --inspect=9230",
+    "start:inspect": "next start -p 3001 --inspect=9230",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
