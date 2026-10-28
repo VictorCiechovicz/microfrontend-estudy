@@ -2,6 +2,7 @@
 
 import { Button } from "@lab/ui";
 import { useState } from "react";
+import styles from "./product.module.css";
 
 const CART_CHANGED = "lab:cart-changed";
 
@@ -44,11 +45,15 @@ export function AddToCart({
   }
 
   return (
-    <p>
-      <Button onClick={add} disabled={status === "pending"}>
+    <div className={styles.addToCart}>
+      <Button size="lg" onClick={add} disabled={status === "pending"}>
         {label}
       </Button>
-      {status === "failed" ? <span role="alert"> {failedLabel}</span> : null}
-    </p>
+      {status === "failed" ? (
+        <span role="alert" className={styles.inlineError}>
+          {failedLabel}
+        </span>
+      ) : null}
+    </div>
   );
 }

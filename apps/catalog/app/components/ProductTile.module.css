@@ -1,0 +1,42 @@
+.tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  overflow: hidden;
+  width: 100%;
+  border-radius: var(--lab-radius-sm);
+  background:
+    radial-gradient(
+      circle at 78% 24%,
+      hsl(var(--tile-hue) 70% 86%) 0 22%,
+      transparent 23%
+    ),
+    linear-gradient(
+      135deg,
+      hsl(var(--tile-hue) 60% 94%),
+      hsl(calc(var(--tile-hue) + 40) 55% 88%)
+    );
+}
+
+.md {
+  aspect-ratio: 16 / 10;
+}
+
+.lg {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--lab-radius);
+}
+
+.code {
+  margin: 0.6rem 0.75rem;
+  color: hsl(var(--tile-hue) 35% 38%);
+  font-family: var(--lab-mono);
+  font-size: var(--lab-text-xs);
+  font-weight: 700;
+}
+
+.lg .code {
+  margin: 1rem 1.1rem;
+  font-size: var(--lab-text-sm);
+}

@@ -1,5 +1,7 @@
+import { Card, PageHeader } from "@lab/ui";
 import { Suspense } from "react";
 import { t } from "../../../../../lib/i18n";
+import styles from "../../catalog.module.css";
 import { ErrorLab } from "./ErrorLab";
 import { HydrationMismatch } from "./HydrationMismatch";
 
@@ -10,26 +12,42 @@ export default async function ErrorLabPage({
 }: {
   searchParams: SearchParams;
 }) {
+  const header = (
+    <PageHeader
+      eyebrow={await t("catalogEyebrow")}
+      title={await t("errorLab")}
+      lead={await t("errorLabLead")}
+    />
+  );
   if (process.env.NODE_ENV === "production") {
     return (
       <main>
-        <h1>{await t("errorLab")}</h1>
-        <p>{await t("errorLabDevOnly")}</p>
+        {header}
+        <Card className={styles.notice}>
+          <p>
+            <strong>{await t("errorLabDevOnly")}</strong>
+          </p>
+          <p>{await t("errorLabHowTo")}</p>
+        </Card>
       </main>
     );
   }
   return (
     <main>
-      <h1>{await t("errorLab")}</h1>
-      <ErrorLab
-        labels={{
-          causeChain: await t("errorLabCauseChain"),
-          hydrationMismatch: await t("errorLabHydration"),
-        }}
-      />
-      <Suspense fallback={null}>
-        <MismatchSlot searchParams={searchParams} />
-      </Suspense>
+      {header}
+      <Card className={styles.notice}>
+        <div className={styles.labActions}>
+          <ErrorLab
+            labels={{
+              causeChain: await t("errorLabCauseChain"),
+              hydrationMismatch: await t("errorLabHydration"),
+            }}
+          />
+        </div>
+        <Suspense fallback={null}>
+          <MismatchSlot searchParams={searchParams} />
+        </Suspense>
+      </Card>
     </main>
   );
 }

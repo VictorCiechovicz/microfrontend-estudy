@@ -2,13 +2,18 @@
 
 import { Button } from "@lab/ui";
 import { Fragment, type FragmentInstance, type ReactNode, useRef } from "react";
+import styles from "./product.module.css";
 
 export function ReviewsJump({
   label,
+  summary,
+  buy,
   reviews,
   children,
 }: {
   label: string;
+  summary: ReactNode;
+  buy: ReactNode;
   reviews: ReactNode;
   children: ReactNode;
 }) {
@@ -19,14 +24,20 @@ export function ReviewsJump({
   }
   return (
     <>
-      <p>
-        <Button variant="ghost" onClick={jumpToReviews}>
-          {label}
-        </Button>
-      </p>
-      {children}
+      <div className={styles.detail}>
+        <div className={styles.summary}>{summary}</div>
+        <aside className={styles.aside} data-slot="product-aside">
+          <div className={styles.buy}>
+            {buy}
+            <Button variant="secondary" onClick={jumpToReviews}>
+              {label} ↓
+            </Button>
+          </div>
+        </aside>
+      </div>
       {/* biome-ignore lint/complexity/noUselessFragments: the ref needs a Fragment */}
       <Fragment ref={reviewsRef}>{reviews}</Fragment>
+      {children}
     </>
   );
 }

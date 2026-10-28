@@ -38,7 +38,7 @@ Para testar a flag, crie o cookie no DevTools (`document.cookie = 'lab_flag_sale
 Onde observar:
 
 1. No console do navegador, em `/`, rode `window.__marker = 1` e clique em "Catalog". Depois rode `window.__marker`: dá `undefined`, porque a página foi recarregada.
-2. Em `/catalog/pt`, repita e clique em "Guides": `window.__marker` continua `1`.
+2. Em `/catalog/pt`, repita e clique em "Guias": `window.__marker` continua `1`.
 3. Na aba Network, a navegação dura mostra um request de documento (`/catalog/pt`) e os scripts em `/catalog-static/_next/...`; a suave mostra só um fetch com `?_rsc=` (header `RSC: 1`).
 4. O atributo `<html data-zone="...">` indica qual zona renderizou a página.
 

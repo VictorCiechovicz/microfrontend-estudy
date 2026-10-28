@@ -8,7 +8,7 @@ const SEED_PRICES = { [STOCK_PRODUCT_ID]: 1600, [PRICE_PRODUCT_ID]: 1700 };
 async function loginAsBruno(page: Page) {
   await page.goto("/account/login");
   await page.getByLabel("Bruno").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 }
 
@@ -68,9 +68,7 @@ function listPriceOf(page: Page, productId: number) {
 }
 
 function unreadBadge(page: Page) {
-  return page
-    .getByRole("banner")
-    .getByRole("status", { name: /unread notifications/ });
+  return page.getByRole("banner").getByRole("status", { name: /não lidas/ });
 }
 
 async function stockOf(page: Page): Promise<number> {
@@ -100,9 +98,9 @@ test("order placed in account updates stock shown in catalog", async ({
 
   await putInCart(page, STOCK_PRODUCT_ID, 2);
   await page.goto("/account/orders");
-  await page.getByRole("button", { name: "Place order" }).click();
+  await page.getByRole("button", { name: "Fazer pedido" }).click();
   await expect(page.getByRole("main").getByRole("status")).toHaveText(
-    /^Order #\d+ placed$/,
+    /^Pedido #\d+ realizado$/,
   );
 
   await page.goto(`/catalog/pt/products/${STOCK_PRODUCT_ID}`);
@@ -149,7 +147,7 @@ test("reading a notification updates the catalog header badge", async ({
   await page.goto("/account/notifications");
   const markRead = page
     .getByRole("main")
-    .getByRole("button", { name: "Mark as read" });
+    .getByRole("button", { name: "Marcar como lida" });
   await expect(markRead.first()).toBeVisible();
   for (let left = await markRead.count(); left > 0; left--) {
     await markRead.first().click();

@@ -1,21 +1,48 @@
-import { Price } from "@lab/ui";
+import { EmptyState, PageHeader, Price, Skeleton } from "@lab/ui";
 import { navigation } from "next/cache";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getCartLines, getOrders } from "../../lib/data";
 import { requireUserId } from "../../lib/session";
+import styles from "../components/account.module.css";
 import { PlaceOrderButton } from "../components/PlaceOrderButton";
+
+const DATE = new Intl.DateTimeFormat("pt-BR", {
+  dateStyle: "short",
+  timeStyle: "short",
+});
 
 export default function OrdersPage() {
   return (
     <main>
-      <h1>Orders</h1>
-      <Suspense fallback={<p aria-busy="true">Loading cart…</p>}>
-        <Cart />
-      </Suspense>
-      <Suspense fallback={<p aria-busy="true">Loading orders…</p>}>
-        <OrderHistory />
-      </Suspense>
+      <Link href="/" className="lab-back">
+        ← Minha conta
+      </Link>
+      <PageHeader
+        eyebrow="Zona conta"
+        title="Pedidos"
+        lead="Revise o carrinho, faça o pedido e acompanhe o histórico."
+      />
+      <div className={styles.ordersLayout}>
+        <Suspense
+          fallback={
+            <div className={styles.panel}>
+              <Skeleton label="Carregando carrinho…" />
+            </div>
+          }
+        >
+          <Cart />
+        </Suspense>
+        <Suspense
+          fallback={
+            <div className={styles.panel}>
+              <Skeleton label="Carregando pedidos…" />
+            </div>
+          }
+        >
+          <OrderHistory />
+        </Suspense>
+      </div>
     </main>
   );
 }
@@ -24,29 +51,58 @@ async function Cart() {
   const userId = await requireUserId();
   const lines = await getCartLines(userId);
   return (
-    <section aria-labelledby="cart-heading">
-      <h2 id="cart-heading">Cart</h2>
+    <section aria-labelledby="cart-heading" className={styles.panel}>
+      <h2 id="cart-heading">Carrinho</h2>
       {lines.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <EmptyState action={<a href="/catalog/pt">Ver catálogo →</a>}>
+          Seu carrinho está vazio.
+        </EmptyState>
       ) : (
-        <>
-          <ul>
-            {lines.map((line) => (
-              <li key={line.productId}>
-                {line.qty} × {line.name} <Price cents={line.priceCents} />
-              </li>
-            ))}
-          </ul>
-          <p data-testid="cart-total">
-            Total{" "}
-            <Price
-              cents={lines.reduce(
-                (sum, line) => sum + line.priceCents * line.qty,
-                0,
-              )}
-            />
-          </p>
-        </>
+        <div className={styles.tableWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Produto</th>
+                <th scope="col" className="lab-num">
+                  Qtd.
+                </th>
+                <th scope="col" className="lab-num">
+                  Preço
+                </th>
+                <th scope="col" className="lab-num">
+                  Subtotal
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {lines.map((line) => (
+                <tr key={line.productId}>
+                  <td>{line.name}</td>
+                  <td className="lab-num">{line.qty}</td>
+                  <td className="lab-num">
+                    <Price cents={line.priceCents} />
+                  </td>
+                  <td className="lab-num">
+                    <Price cents={line.priceCents * line.qty} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr data-testid="cart-total">
+                <td colSpan={3}>Total</td>
+                <td className="lab-num">
+                  <Price
+                    cents={lines.reduce(
+                      (sum, line) => sum + line.priceCents * line.qty,
+                      0,
+                    )}
+                  />
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       )}
       <PlaceOrderButton />
     </section>
@@ -58,19 +114,43 @@ async function OrderHistory() {
   await navigation();
   const orders = await getOrders(userId);
   return (
-    <section aria-labelledby="history-heading">
-      <h2 id="history-heading">Order history</h2>
+    <section aria-labelledby="history-heading" className={styles.panel}>
+      <h2 id="history-heading">Histórico de pedidos</h2>
       {orders.length === 0 ? (
-        <p>No orders yet.</p>
+        <EmptyState>Nenhum pedido ainda.</EmptyState>
       ) : (
-        <ul>
-          {orders.map((order) => (
-            <li key={order.id} data-testid="order-row">
-              <Link href={`/orders/${order.id}`}>Order #{order.id}</Link>{" "}
-              <Price cents={order.totalCents} />
-            </li>
-          ))}
-        </ul>
+        <div className={styles.tableWrap}>
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Pedido</th>
+                <th scope="col">Data</th>
+                <th scope="col" className="lab-num">
+                  Itens
+                </th>
+                <th scope="col" className="lab-num">
+                  Total
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id} data-testid="order-row">
+                  <td>
+                    <Link href={`/orders/${order.id}`}>Pedido #{order.id}</Link>
+                  </td>
+                  <td>{DATE.format(new Date(order.createdAt))}</td>
+                  <td className="lab-num">
+                    {order.lines.reduce((sum, line) => sum + line.qty, 0)}
+                  </td>
+                  <td className="lab-num">
+                    <Price cents={order.totalCents} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </section>
   );

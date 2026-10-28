@@ -1,10 +1,12 @@
 import type { Lang } from "@lab/db/langs";
 import { RemoteWidget } from "@lab/mf-host";
-import { Price } from "@lab/ui";
+import { Card, PageHeader, Price } from "@lab/ui";
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { getProductList } from "../../../lib/data";
 import { currentLang, t } from "../../../lib/i18n";
+import { ProductTile } from "../../components/ProductTile";
+import styles from "./catalog.module.css";
 import { SlideTransition } from "./SlideTransition";
 
 function ProductLink({
@@ -35,25 +37,57 @@ export default async function CatalogPage() {
   return (
     <SlideTransition>
       <main>
-        <h1>{await t("catalog")}</h1>
-        <nav>
-          <Link href={`/catalog/${lang}/guides`}>Guides</Link>
-        </nav>
+        <PageHeader
+          eyebrow={await t("catalogEyebrow")}
+          title={await t("catalog")}
+          lead={await t("catalogLead")}
+          actions={
+            <nav className={styles.subnav} aria-label={await t("catalog")}>
+              <Link href={`/catalog/${lang}/guides`}>{await t("guides")}</Link>
+              <Link href={`/catalog/${lang}/admin`}>
+                {await t("priceAdmin")}
+              </Link>
+              <Link href={`/catalog/${lang}/lab/errors`}>
+                {await t("errorLab")}
+              </Link>
+            </nav>
+          }
+        />
         {featured ? (
-          <p data-testid="featured-price">
-            <ProductLink lang={lang} id={featured.id} name={featured.name} />:{" "}
-            <Price cents={featured.priceCents} lang={lang} />
-          </p>
+          <Card
+            interactive
+            className={styles.featured}
+            data-testid="featured-price"
+          >
+            <ProductTile id={featured.id} />
+            <div className={styles.featuredText}>
+              <span className={styles.tag}>{await t("featured")}</span>
+              <h2 className={styles.featuredName}>
+                <ProductLink
+                  lang={lang}
+                  id={featured.id}
+                  name={featured.name}
+                />
+              </h2>
+              <Price cents={featured.priceCents} lang={lang} />
+            </div>
+          </Card>
         ) : null}
-        <ul>
+        <h2 className={styles.gridHeading}>{await t("allProducts")}</h2>
+        <ul className={styles.grid}>
           {rest.map((product) => (
-            <li key={product.id}>
-              <ProductLink lang={lang} id={product.id} name={product.name} />{" "}
+            <Card as="li" interactive key={product.id}>
+              <ProductTile id={product.id} />
+              <h3 className={styles.cardName}>
+                <ProductLink lang={lang} id={product.id} name={product.name} />
+              </h3>
               <Price cents={product.priceCents} lang={lang} />
-            </li>
+            </Card>
           ))}
         </ul>
-        <RemoteWidget name="HelloWidget" />
+        <div className={styles.widgetRow}>
+          <RemoteWidget name="HelloWidget" />
+        </div>
       </main>
     </SlideTransition>
   );

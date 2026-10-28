@@ -1,12 +1,19 @@
 import styles from "./Badge.module.css";
 
-export function Badge({ count, label }: { count: number; label: string }) {
+export function Badge({
+  count,
+  label,
+  tone = "alert",
+}: {
+  count: number;
+  label: string;
+  tone?: "alert" | "neutral";
+}) {
+  const classes = [styles.badge, styles[tone], count === 0 ? styles.zero : ""]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <span
-      className={styles.badge}
-      role="status"
-      aria-label={`${count} ${label}`}
-    >
+    <span className={classes} role="status" aria-label={`${count} ${label}`}>
       {count}
     </span>
   );

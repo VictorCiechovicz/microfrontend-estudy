@@ -1,3 +1,5 @@
+import { Card, Skeleton } from "@lab/ui";
+import Link from "next/link";
 import { Suspense } from "react";
 import { OrderDetail } from "../../components/OrderDetail";
 
@@ -8,9 +10,14 @@ export default function OrderPage({
 }) {
   return (
     <main>
-      <Suspense fallback={<p aria-busy="true">Loading order…</p>}>
-        <OrderDetail params={params} heading="h1" />
-      </Suspense>
+      <Link href="/orders" className="lab-back">
+        ← Pedidos
+      </Link>
+      <Card>
+        <Suspense fallback={<Skeleton label="Carregando pedido…" />}>
+          <OrderDetail params={params} heading="h1" />
+        </Suspense>
+      </Card>
     </main>
   );
 }

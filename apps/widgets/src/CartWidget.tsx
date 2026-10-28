@@ -2,6 +2,7 @@ import { Badge } from "@lab/ui";
 import { useEffect, useState } from "react";
 import { CART_CHANGED, type CartChangedDetail } from "./cart-events";
 import { createMount } from "./mount";
+import styles from "./widgets.module.css";
 
 type CartBody = { lines: { qty: number }[] };
 
@@ -56,11 +57,22 @@ export default function CartWidget() {
 
   if (count === null) return null;
   return (
-    <a href="/account/orders">
-      Cart{" "}
+    <a href="/account/orders" className={`${styles.root} ${styles.cart}`}>
+      <svg
+        className={styles.cartIcon}
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="9" cy="20" r="1.5" />
+        <circle cx="18" cy="20" r="1.5" />
+        <path d="M2.5 3h2.6l2.4 12.2a1.6 1.6 0 0 0 1.6 1.3h8.6a1.6 1.6 0 0 0 1.6-1.2L21.5 8H6.1" />
+      </svg>
+      Carrinho{" "}
       <Badge
         count={count}
-        label={count === 1 ? "item in cart" : "items in cart"}
+        tone="neutral"
+        label={count === 1 ? "item no carrinho" : "itens no carrinho"}
       />
     </a>
   );

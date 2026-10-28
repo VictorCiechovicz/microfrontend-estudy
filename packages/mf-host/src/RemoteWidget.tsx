@@ -30,7 +30,9 @@ export type RemoteWidgetProps<N extends WidgetName> = {
 };
 
 const DEFAULT_FALLBACK = (
-  <span data-testid="widget-fallback">Widget unavailable</span>
+  <span data-testid="widget-fallback" className="lab-widget-fallback">
+    Widget indisponível
+  </span>
 );
 
 class WidgetErrorBoundary extends Component<
@@ -77,11 +79,15 @@ export function RemoteWidget<N extends WidgetName>({
   }, [name]);
 
   if (state?.name !== name) return null;
-  if (state.status === "failed") return fallback;
-  const { Widget } = state;
   return (
-    <WidgetErrorBoundary key={name} fallback={fallback}>
-      <Widget {...(props ?? ({} as WidgetProps[N]))} />
-    </WidgetErrorBoundary>
+    <div className="lab-remote" data-remote-widget={name}>
+      {state.status === "failed" ? (
+        fallback
+      ) : (
+        <WidgetErrorBoundary key={name} fallback={fallback}>
+          <state.Widget {...(props ?? ({} as WidgetProps[N]))} />
+        </WidgetErrorBoundary>
+      )}
+    </div>
   );
 }

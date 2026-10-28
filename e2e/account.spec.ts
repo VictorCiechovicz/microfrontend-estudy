@@ -6,7 +6,7 @@ const OFFLINE_PRODUCT_ID = 8;
 async function loginAsAna(page: Page) {
   await page.goto("/account/login");
   await page.getByLabel("Ana").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 }
 
@@ -18,17 +18,15 @@ async function putInCart(page: Page, productId: number) {
 }
 
 function unreadBadge(page: Page) {
-  return page
-    .getByRole("banner")
-    .getByRole("status", { name: /unread notifications/ });
+  return page.getByRole("banner").getByRole("status", { name: /não lidas/ });
 }
 
 test.afterAll(async ({ browser }) => {
   const page = await browser.newPage();
   await loginAsAna(page);
   await page.goto("/account/profile");
-  await page.getByLabel("Name").fill("Ana");
-  await page.getByRole("button", { name: "Save" }).click();
+  await page.getByLabel("Nome").fill("Ana");
+  await page.getByRole("button", { name: "Salvar" }).click();
   await expect(page.getByTestId("user-name")).toHaveText("Ana");
   await page.close();
 });
@@ -39,10 +37,10 @@ test("profile edit shows new name immediately (updateTag)", async ({
   await loginAsAna(page);
   await page.goto("/account/profile");
   await expect(page.getByTestId("user-name")).toHaveText("Ana");
-  await page.getByLabel("Name").fill("Ana Lab");
-  await page.getByRole("button", { name: "Save" }).click();
+  await page.getByLabel("Nome").fill("Ana Lab");
+  await page.getByRole("button", { name: "Salvar" }).click();
   await expect(page.getByTestId("user-name")).toHaveText("Ana Lab");
-  await expect(page.getByLabel("Name")).toHaveValue("Ana Lab");
+  await expect(page.getByLabel("Nome")).toHaveValue("Ana Lab");
 });
 
 test("marking notification read updates header badge (refresh)", async ({
@@ -54,7 +52,7 @@ test("marking notification read updates header badge (refresh)", async ({
   expect(before).toBeGreaterThanOrEqual(1);
   await page
     .getByRole("main")
-    .getByRole("button", { name: "Mark as read" })
+    .getByRole("button", { name: "Marcar como lida" })
     .first()
     .click();
   await expect(unreadBadge(page)).toHaveText(String(before - 1));
@@ -68,9 +66,9 @@ test("order detail opens as modal from list and as page on reload", async ({
   await page.goto("/account/orders");
   const cartBadge = page
     .getByRole("banner")
-    .getByRole("status", { name: /in cart/ });
+    .getByRole("status", { name: /no carrinho/ });
   await expect(cartBadge).toHaveText(/^[1-9]\d*$/);
-  await page.getByRole("button", { name: "Place order" }).click();
+  await page.getByRole("button", { name: "Fazer pedido" }).click();
   const row = page.getByTestId("order-row").first();
   await expect(row).toBeVisible();
   await expect(cartBadge).toHaveText("0");
@@ -80,14 +78,14 @@ test("order detail opens as modal from list and as page on reload", async ({
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
   await expect(dialog.getByRole("heading", { level: 2 })).toHaveText(
-    /^Order #\d+$/,
+    /^Pedido #\d+$/,
   );
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Orders");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pedidos");
   await expect(dialog).toContainText("R$");
 
   await page
     .getByRole("banner")
-    .getByRole("link", { name: /unread notifications/ })
+    .getByRole("link", { name: /não lidas/ })
     .dispatchEvent("click");
   await expect(page).toHaveURL("/account/notifications");
   await expect(page.getByRole("dialog")).toHaveCount(0);
@@ -97,7 +95,7 @@ test("order detail opens as modal from list and as page on reload", async ({
   await page.reload();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    /^Order #\d+$/,
+    /^Pedido #\d+$/,
   );
 });
 
@@ -108,17 +106,17 @@ for (const session of [null, "999"]) {
   }) => {
     await loginAsAna(page);
     await page.goto("/account/profile");
-    await expect(page.getByLabel("Name")).toBeVisible();
+    await expect(page.getByLabel("Nome")).toBeVisible();
     await context.clearCookies();
     if (session) {
       await context.addCookies([
         { name: "lab_user", value: session, url: "http://localhost:3000" },
       ]);
     }
-    await page.getByLabel("Name").fill("Nobody");
-    await page.getByRole("button", { name: "Save" }).click();
+    await page.getByLabel("Nome").fill("Nobody");
+    await page.getByRole("button", { name: "Salvar" }).click();
     await expect(page).toHaveURL(/\/account\/login(\?|$)/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Log in");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Entrar");
   });
 }
 
@@ -131,36 +129,36 @@ test("place order while offline completes when back online", async ({
   await page.goto("/account/orders");
   const rows = page.getByTestId("order-row");
   await expect(
-    page.getByRole("region", { name: "Order history" }),
+    page.getByRole("region", { name: "Histórico de pedidos" }),
   ).toBeVisible();
   const before = await rows.count();
 
   await context.setOffline(true);
-  await page.getByRole("button", { name: "Place order" }).click();
+  await page.getByRole("button", { name: "Fazer pedido" }).click();
   await expect(
-    page.getByText("Placing order (offline, will retry)…"),
+    page.getByText("Enviando pedido (offline, vai tentar de novo)…"),
   ).toBeVisible();
-  await expect(page.getByText(/You are offline/)).toBeVisible();
+  await expect(page.getByText(/Você está offline/)).toBeVisible();
   await context.setOffline(false);
   await expect(page.getByTestId("order-row").first()).toBeVisible();
   await expect(rows).toHaveCount(before + 1);
-  await expect(page.getByText(/You are offline/)).toHaveCount(0);
+  await expect(page.getByText(/Você está offline/)).toHaveCount(0);
 });
 
 test("order history waits for navigation (navigation())", async ({ page }) => {
   await loginAsAna(page);
   await instant(page, async () => {
-    await page.getByRole("link", { name: "Orders", exact: true }).click();
+    await page.getByRole("link", { name: "Pedidos", exact: true }).click();
     await page.waitForURL((url) => url.pathname === "/account/orders");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Orders");
-    await expect(page.getByRole("region", { name: "Cart" })).toBeVisible();
-    await expect(page.getByText("Loading orders…")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pedidos");
+    await expect(page.getByRole("region", { name: "Carrinho" })).toBeVisible();
+    await expect(page.getByText("Carregando pedidos…")).toBeVisible();
     await expect(
-      page.getByRole("region", { name: "Order history" }),
+      page.getByRole("region", { name: "Histórico de pedidos" }),
     ).toHaveCount(0);
   });
   await expect(
-    page.getByRole("region", { name: "Order history" }),
+    page.getByRole("region", { name: "Histórico de pedidos" }),
   ).toBeVisible();
 });
 

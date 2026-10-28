@@ -29,7 +29,10 @@ test("cross-zone link is a hard navigation", async ({ page }) => {
   await page.evaluate(() => {
     window.__marker = 1;
   });
-  await page.getByRole("main").getByRole("link", { name: "Catalog" }).click();
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Explorar o catálogo" })
+    .click();
   await expect(page.locator("html")).toHaveAttribute("data-zone", "catalog");
   expect(await page.evaluate(() => window.__marker)).toBeUndefined();
 });
@@ -39,9 +42,9 @@ test("same-zone link is a soft navigation", async ({ page }) => {
   await page.evaluate(() => {
     window.__marker = 1;
   });
-  await page.getByRole("link", { name: "Guides" }).click();
+  await page.getByRole("link", { name: "Guias" }).click();
   await expect(page).toHaveURL("/catalog/pt/guides");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Guides");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Guias");
   expect(await page.evaluate(() => window.__marker)).toBe(1);
 });
 

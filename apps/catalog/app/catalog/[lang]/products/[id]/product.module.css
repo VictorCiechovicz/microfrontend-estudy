@@ -1,0 +1,252 @@
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 21rem;
+  align-items: start;
+  gap: 2rem;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid var(--lab-border);
+  border-radius: var(--lab-radius-lg);
+  background: var(--lab-surface);
+  box-shadow: var(--lab-shadow);
+}
+
+.summary > :first-child {
+  grid-row: 1 / span 2;
+}
+
+.title {
+  align-self: end;
+  margin: 0 0 0.5rem;
+  font-size: var(--lab-text-3xl);
+}
+
+.description {
+  margin: 0;
+  color: var(--lab-text-muted);
+  font-size: var(--lab-text-lg);
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.buy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid var(--lab-border);
+  border-top: 3px solid var(--lab-zone);
+  border-radius: var(--lab-radius-lg);
+  background: var(--lab-surface);
+  box-shadow: var(--lab-shadow);
+}
+
+.buy > button {
+  width: 100%;
+}
+
+.price {
+  margin: 0;
+  font-size: var(--lab-text-2xl);
+}
+
+.stock,
+.stockPending {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--lab-text-muted);
+  font-size: var(--lab-text-sm);
+}
+
+.stock::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lab-account);
+}
+
+.stockOut::before {
+  background: var(--lab-danger);
+}
+
+.stockError {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--lab-radius-sm);
+  background: var(--lab-danger-soft);
+  color: var(--lab-danger);
+  font-size: var(--lab-text-sm);
+}
+
+.stockError p {
+  margin: 0;
+}
+
+.addToCart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.addToCart button {
+  width: 100%;
+}
+
+.inlineError {
+  color: var(--lab-danger);
+  font-size: var(--lab-text-sm);
+}
+
+.section {
+  margin-top: 2.5rem;
+}
+
+.section h2 {
+  margin-bottom: 1rem;
+}
+
+.count {
+  color: var(--lab-text-subtle);
+  font-weight: 500;
+}
+
+.linkGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.linkCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+  border: 1px solid var(--lab-border);
+  border-radius: var(--lab-radius);
+  background: var(--lab-surface);
+  transition:
+    border-color 120ms,
+    box-shadow 120ms;
+}
+
+.linkCard:hover,
+.linkCard:focus-within {
+  border-color: var(--lab-zone);
+  box-shadow: var(--lab-shadow-lg);
+}
+
+.linkCard a {
+  color: var(--lab-text);
+  font-weight: 600;
+  font-size: var(--lab-text-sm);
+}
+
+.linkCard a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.linkCard a:hover {
+  text-decoration: none;
+}
+
+.reviews {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review {
+  padding: 1rem;
+  border: 1px solid var(--lab-border);
+  border-radius: var(--lab-radius);
+  background: var(--lab-surface);
+}
+
+.review p {
+  margin: 0.5rem 0 0;
+  color: var(--lab-text-muted);
+  font-size: var(--lab-text-sm);
+}
+
+.reviewHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--lab-text-sm);
+}
+
+.reviewAvatar {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--lab-zone-soft);
+  color: var(--lab-zone);
+  font-size: var(--lab-text-xs);
+  font-weight: 700;
+}
+
+.stars {
+  margin-left: auto;
+  color: #d97706;
+  font-size: var(--lab-text-xs);
+  white-space: nowrap;
+}
+
+.widget {
+  margin-top: 2.5rem;
+}
+
+@media (max-width: 860px) {
+  .detail {
+    grid-template-columns: 1fr;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .summary > :first-child {
+    grid-row: auto;
+    margin-bottom: 1rem;
+    max-width: 18rem;
+  }
+
+  .title {
+    font-size: var(--lab-text-2xl);
+  }
+}
+
+@media (max-width: 560px) {
+  .linkGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

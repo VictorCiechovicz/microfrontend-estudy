@@ -54,7 +54,7 @@ test("a widget that throws while rendering shows the fallback and keeps its sibl
   expect(container.querySelector("h1")?.textContent).toBe("Zone page");
   expect(
     container.querySelector('[data-testid="widget-fallback"]')?.textContent,
-  ).toBe("Widget unavailable");
+  ).toBe("Widget indisponível");
 });
 
 test("changing the name drops the previous widget while the next one loads", async () => {
@@ -75,7 +75,7 @@ test("a failed widget does not keep the fallback after the name changes", async 
     "widgets/Recommendations": () => <p>recommendations widget</p>,
   });
   await act(async () => root.render(<RemoteWidget name="CartWidget" />));
-  expect(container.textContent).toBe("Widget unavailable");
+  expect(container.textContent).toBe("Widget indisponível");
 
   await act(async () => root.render(<RemoteWidget name="Recommendations" />));
   expect(container.textContent).toBe("recommendations widget");
@@ -86,7 +86,7 @@ test("an unavailable remote shows the fallback and logs a warning, not an error"
   const error = vi.mocked(console.error);
   loadRemote.mockRejectedValue(new Error("Failed to get manifest"));
   await act(async () => root.render(<RemoteWidget name="CartWidget" />));
-  expect(container.textContent).toBe("Widget unavailable");
+  expect(container.textContent).toBe("Widget indisponível");
   expect(warn).toHaveBeenCalledTimes(1);
   expect(error).not.toHaveBeenCalled();
 });

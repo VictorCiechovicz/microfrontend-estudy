@@ -1,5 +1,5 @@
 import { unreadCount } from "@lab/db";
-import { Badge } from "@lab/ui";
+import { NotificationBell } from "@lab/ui";
 import Link from "next/link";
 import { connection } from "next/server";
 import { getSessionUserId } from "../../lib/session";
@@ -10,7 +10,7 @@ export async function NotificationBadge() {
   if (userId === null) return null;
   return (
     <Link href="/notifications">
-      <Badge count={unreadCount(userId)} label="unread notifications" />
+      <NotificationBell count={unreadCount(userId)} />
     </Link>
   );
 }

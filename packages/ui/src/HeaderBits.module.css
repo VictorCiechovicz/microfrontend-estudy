@@ -1,0 +1,46 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--lab-border);
+  border-radius: 999px;
+  background: var(--lab-surface);
+  color: var(--lab-text-muted);
+}
+
+a:hover > .pill {
+  border-color: var(--lab-zone);
+  color: var(--lab-zone);
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.user {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: var(--lab-text-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--lab-zone-soft);
+  color: var(--lab-zone);
+  font-size: var(--lab-text-xs);
+  font-weight: 700;
+}

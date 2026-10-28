@@ -7,7 +7,7 @@ test("remote widget renders inside catalog zone", async ({ page }) => {
   });
   await page.goto("/catalog/pt");
   await expect(page.getByTestId("hello-widget")).toHaveText(
-    "Hello from widgets",
+    "Olá do app widgets",
   );
   expect(
     errors.filter((e) =>

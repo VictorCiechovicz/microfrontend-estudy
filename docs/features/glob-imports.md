@@ -15,7 +15,7 @@ Disponível no Turbopack do Next 16.4.3 (não existe com webpack). Os tipos vêm
 - `apps/catalog/content/guides/*.md`: três guias (`caring-for-your-order`, `choosing-a-product`, `returns`). A primeira linha `# Título` é o título; os blocos seguintes, separados por linha em branco, são parágrafos.
 - `apps/catalog/next.config.ts`: `turbopack.rules['*.md'] = { condition: { query: '?raw' }, type: 'text' }`. Só imports de `.md` com `?raw` viram módulo de texto (export `default` com o conteúdo).
 - `apps/catalog/lib/guides.ts`: `import.meta.glob<{ default: string }>('../content/guides/*.md', { eager: true, query: '?raw' })`, mais `guides` (lista) e `getGuide(slug)`.
-- `apps/catalog/app/catalog/[lang]/guides/page.tsx`: lista os guias com `<Link>` para `/catalog/<lang>/guides/<slug>`. O `<h1>` continua "Guides" (o `zones.spec` depende dele).
+- `apps/catalog/app/catalog/[lang]/guides/page.tsx`: lista os guias com `<Link>` para `/catalog/<lang>/guides/<slug>`. O `<h1>` é "Guias" em pt e "Guides" em en (o `zones.spec` depende dele).
 - `apps/catalog/app/catalog/[lang]/guides/[slug]/page.tsx`: `generateStaticParams` a partir de `guides`; `notFound()` para slug desconhecido.
 - `apps/catalog/proxy.ts`: também casa `/catalog/:lang/guides/:slug` e reescreve para `/catalog/<lang>/_missing` quando `getGuide(slug)` não acha o guia. Sem isso, `/catalog/pt/guides/nope` respondia `200` (o `notFound()` dentro de `<Suspense>` chega depois do shell já enviado, o mesmo problema descrito em `isr-shell.md`). O proxy usa o mesmo `lib/guides.ts`, então o glob também roda no bundle do proxy.
 

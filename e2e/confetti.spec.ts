@@ -5,7 +5,7 @@ const PRODUCT_ID = 8;
 async function loginAsAna(page: Page) {
   await page.goto("/account/login");
   await page.getByLabel("Ana").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 }
 
@@ -19,7 +19,7 @@ test("canvas-confetti is a lazy chunk fetched only after an order is placed", as
   expect(added.status()).toBe(200);
   await page.goto("/account/orders");
   await expect(
-    page.getByRole("region", { name: "Order history" }),
+    page.getByRole("region", { name: "Histórico de pedidos" }),
   ).toBeVisible();
 
   const chunks: Array<{ url: string; body: Promise<string> }> = [];
@@ -37,9 +37,9 @@ test("canvas-confetti is a lazy chunk fetched only after an order is placed", as
   );
   expect(initialScripts.length).toBeGreaterThan(0);
 
-  await page.getByRole("button", { name: "Place order" }).click();
+  await page.getByRole("button", { name: "Fazer pedido" }).click();
   await expect(
-    page.getByRole("status").filter({ hasText: /placed/ }),
+    page.getByRole("status").filter({ hasText: /realizado/ }),
   ).toBeVisible();
 
   await expect

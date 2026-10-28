@@ -6,7 +6,7 @@ const PRODUCT_PATH = `/catalog/pt/products/${WIDGETS_PRODUCT_ID}`;
 async function loginAsCarla(page: Page) {
   await page.goto("/account/login");
   await page.getByLabel("Carla").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 }
 
@@ -23,7 +23,7 @@ async function emptyCart(page: Page) {
 }
 
 function cartBadge(page: Page) {
-  return page.getByRole("banner").getByRole("status", { name: /in cart/ });
+  return page.getByRole("banner").getByRole("status", { name: /no carrinho/ });
 }
 
 test.afterAll(async ({ browser }) => {
@@ -45,7 +45,7 @@ test("cart widget follows the cart across zones", async ({ page }) => {
 
   await page
     .getByRole("banner")
-    .getByRole("link", { name: "Account", exact: true })
+    .getByRole("link", { name: "Minha conta", exact: true })
     .click();
   await expect(page).toHaveURL("/account");
   await expect(page.locator("html")).toHaveAttribute("data-zone", "account");
@@ -173,7 +173,7 @@ test("logged out: cart API is 401, widget stays quiet, add to cart logs in and r
     `/account/login?next=${encodeURIComponent(PRODUCT_PATH)}`,
   );
   await page.getByLabel("Carla").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL(PRODUCT_PATH);
   await expect(page.locator("html")).toHaveAttribute("data-zone", "catalog");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Produto 5");

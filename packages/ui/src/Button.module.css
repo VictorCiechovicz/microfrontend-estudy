@@ -1,18 +1,68 @@
 .button {
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   border: 1px solid transparent;
+  border-radius: var(--lab-radius-sm, 6px);
   font: inherit;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
   cursor: pointer;
+  transition:
+    background-color 120ms,
+    border-color 120ms,
+    color 120ms,
+    box-shadow 120ms;
+}
+
+.button:disabled {
+  cursor: progress;
+  opacity: 0.65;
+}
+
+.sm {
+  padding: 0.35rem 0.7rem;
+  font-size: var(--lab-text-sm, 0.875rem);
+}
+
+.md {
+  padding: 0.55rem 1rem;
+  font-size: var(--lab-text-sm, 0.875rem);
+}
+
+.lg {
+  padding: 0.75rem 1.4rem;
+  font-size: var(--lab-text-md, 1rem);
 }
 
 .primary {
-  background: #1f6feb;
+  background: var(--lab-zone, #2563eb);
   color: #fff;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 0.12);
+}
+
+.primary:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--lab-zone, #2563eb) 86%, black);
+}
+
+.secondary {
+  background: var(--lab-surface, #fff);
+  color: var(--lab-text, #1c2230);
+  border-color: var(--lab-border-strong, #cdd2da);
+}
+
+.secondary:hover:not(:disabled) {
+  border-color: var(--lab-zone, #2563eb);
+  color: var(--lab-zone, #2563eb);
 }
 
 .ghost {
   background: transparent;
-  color: #1f6feb;
-  border-color: #1f6feb;
+  color: var(--lab-zone, #2563eb);
+}
+
+.ghost:hover:not(:disabled) {
+  background: var(--lab-zone-soft, #eaf1fe);
 }

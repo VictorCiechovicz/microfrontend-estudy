@@ -1,7 +1,9 @@
 "use client";
 
+import { Button } from "@lab/ui";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
+import styles from "./account.module.css";
 
 export function Modal({
   label,
@@ -12,25 +14,19 @@ export function Modal({
 }) {
   const router = useRouter();
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        display: "grid",
-        placeItems: "center",
-        background: "rgb(0 0 0 / 0.4)",
-      }}
-    >
+    <div className={styles.backdrop}>
       <div
         role="dialog"
         aria-modal="true"
         aria-label={label}
-        style={{ background: "white", padding: "1.5rem", minWidth: "20rem" }}
+        className={styles.dialog}
       >
-        {children}
-        <button type="button" onClick={() => router.back()}>
-          Close
-        </button>
+        <div className={styles.dialogBody}>{children}</div>
+        <div className={styles.dialogFooter}>
+          <Button variant="secondary" onClick={() => router.back()}>
+            Fechar
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -1,0 +1,42 @@
+.card {
+  position: relative;
+  padding: 1.25rem;
+  border: 1px solid var(--lab-border);
+  border-radius: var(--lab-radius);
+  background: var(--lab-surface);
+  box-shadow: var(--lab-shadow);
+}
+
+.interactive {
+  transition:
+    border-color 120ms,
+    box-shadow 120ms,
+    transform 120ms;
+}
+
+.interactive:hover,
+.interactive:focus-within {
+  border-color: var(--lab-zone);
+  box-shadow: var(--lab-shadow-lg);
+  transform: translateY(-1px);
+}
+
+.interactive a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.interactive a:hover {
+  text-decoration: none;
+}
+
+.interactive a:focus-visible {
+  outline: none;
+}
+
+.interactive:has(a:focus-visible) {
+  outline: 2px solid var(--lab-zone);
+  outline-offset: 2px;
+}

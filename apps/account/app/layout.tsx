@@ -1,5 +1,6 @@
 import { RemoteWidget } from "@lab/mf-host";
 import { SiteFooter, SiteHeader } from "@lab/ui";
+import "@lab/ui/styles.css";
 import { type ReactNode, Suspense } from "react";
 import { NotificationBadge } from "./components/NotificationBadge";
 import { OfflineBanner } from "./components/OfflineBanner";
@@ -13,7 +14,7 @@ export default function RootLayout({
   modal: ReactNode;
 }) {
   return (
-    <html lang="en" data-zone="account">
+    <html lang="pt-BR" data-zone="account">
       <body>
         <SiteHeader
           zone="account"

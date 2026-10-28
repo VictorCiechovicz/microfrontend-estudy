@@ -1,4 +1,4 @@
-import { Badge } from "@lab/ui";
+import { NotificationBell } from "@lab/ui";
 import { getUnreadCount } from "../../lib/data";
 import { getSessionUserId } from "../../lib/session";
 
@@ -7,10 +7,7 @@ export async function NotificationBadge() {
   if (userId === null) return null;
   return (
     <a href="/account/notifications">
-      <Badge
-        count={await getUnreadCount(userId)}
-        label="unread notifications"
-      />
+      <NotificationBell count={await getUnreadCount(userId)} />
     </a>
   );
 }

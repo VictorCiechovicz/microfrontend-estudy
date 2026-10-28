@@ -1,0 +1,39 @@
+.skeleton {
+  padding: 1rem 0;
+}
+
+.label {
+  margin: 0 0 0.6rem;
+  color: var(--lab-text-subtle);
+  font-size: var(--lab-text-sm);
+}
+
+.bar {
+  display: block;
+  height: 0.8rem;
+  margin-bottom: 0.55rem;
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--lab-border) 0%,
+    var(--lab-surface-muted) 50%,
+    var(--lab-border) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar {
+    animation: none;
+  }
+}

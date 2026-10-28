@@ -13,9 +13,9 @@ test("login as Ana lands on next and shows her name in the headers", async ({
 }) => {
   await page.goto("/account/orders");
   await page.getByLabel("Ana").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account/orders");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Orders");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pedidos");
   await expect(page.getByRole("banner")).toContainText("Ana");
 
   await page.goto("/catalog/pt");
@@ -25,13 +25,10 @@ test("login as Ana lands on next and shows her name in the headers", async ({
 test("logout clears the session and returns to login", async ({ page }) => {
   await page.goto("/account/login");
   await page.getByLabel("Ana").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 
-  await page
-    .getByRole("banner")
-    .getByRole("button", { name: "Log out" })
-    .click();
+  await page.getByRole("banner").getByRole("button", { name: "Sair" }).click();
   await expect(page).toHaveURL("/account/login");
   await expect(page.getByRole("banner")).not.toContainText("Ana");
 
@@ -42,7 +39,7 @@ test("logout clears the session and returns to login", async ({ page }) => {
 test("login ignores an off-zone next target", async ({ page }) => {
   await page.goto("/account/login?next=%2F%2Fevil.example");
   await page.getByLabel("Ana").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 });
 
@@ -72,7 +69,7 @@ for (const value of ["999", "abc", "1.0"]) {
 
     await page.goto("/catalog/pt");
     await expect(
-      page.getByRole("banner").getByRole("link", { name: "Log in" }),
+      page.getByRole("banner").getByRole("link", { name: "Entrar" }),
     ).toBeVisible();
     await expect(page.getByTestId("user-name")).toHaveCount(0);
   });
@@ -83,7 +80,7 @@ test("login rejects a next target with control characters", async ({
 }) => {
   await page.goto("/account/login?next=%2F%09%2Fevil.example");
   await page.getByLabel("Ana").check();
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await expect(page).toHaveURL("/account");
 });
 
@@ -95,7 +92,7 @@ test("login with an unknown user keeps the next target", async ({ page }) => {
   });
   await page.getByLabel("Ana").check();
   const action = page.waitForResponse((r) => r.request().method() === "POST");
-  await page.getByRole("button", { name: "Log in" }).click();
+  await page.getByRole("button", { name: "Entrar" }).click();
   await action;
   await expect(page).toHaveURL(/\/account\/login\?next=%2Forders$/);
   await expect(page.getByTestId("user-name")).toHaveCount(0);

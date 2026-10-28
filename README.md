@@ -67,7 +67,7 @@ Usuários de exemplo: Ana (id 1), Bruno (id 2) e Carla (id 3), pelo login em `/a
         CartWidget <-> catálogo/conta: evento do navegador lab:cart-changed + /account/api/cart
 ```
 
-Pacotes: `@lab/db` (SQLite e repositórios), `@lab/cache-sync` (vocabulário de tags e broadcast), `@lab/mf-host` (`RemoteWidget`), `@lab/ui` (componentes comuns), `@lab/tsconfig`.
+Pacotes: `@lab/db` (SQLite e repositórios), `@lab/cache-sync` (vocabulário de tags e broadcast), `@lab/mf-host` (`RemoteWidget`), `@lab/ui` (componentes comuns e a folha global `@lab/ui/styles.css`, com os tokens de cor por zona, importada no layout raiz das três zonas), `@lab/tsconfig`.
 
 ## Matriz de funcionalidades
 

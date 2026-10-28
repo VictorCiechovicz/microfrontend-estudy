@@ -1,6 +1,7 @@
 import { Price } from "@lab/ui";
 import { useEffect, useId, useState } from "react";
 import { createMount } from "./mount";
+import styles from "./widgets.module.css";
 
 type RecommendationsBody = {
   products: { id: number; name: string; priceCents: number; href: string }[];
@@ -41,12 +42,18 @@ export default function Recommendations({
 
   if (body === null) return null;
   return (
-    <section aria-labelledby={headingId}>
-      <h2 id={headingId}>{HEADINGS[lang]}</h2>
-      <ul>
+    <section
+      aria-labelledby={headingId}
+      className={`${styles.root} ${styles.card}`}
+    >
+      <span className={styles.tag}>widgets · :3003</span>
+      <h2 id={headingId} className={styles.heading}>
+        {HEADINGS[lang]}
+      </h2>
+      <ul className={styles.list}>
         {body.products.map((product) => (
-          <li key={product.id}>
-            <a href={product.href}>{product.name}</a>{" "}
+          <li key={product.id} className={styles.item}>
+            <a href={product.href}>{product.name}</a>
             <Price cents={product.priceCents} lang={lang} />
           </li>
         ))}

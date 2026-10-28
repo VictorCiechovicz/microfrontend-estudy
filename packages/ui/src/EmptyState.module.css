@@ -1,0 +1,16 @@
+.empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px dashed var(--lab-border-strong);
+  border-radius: var(--lab-radius);
+  background: var(--lab-surface-muted);
+  color: var(--lab-text-muted);
+}
+
+.text {
+  margin: 0;
+}

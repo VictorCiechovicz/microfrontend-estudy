@@ -63,14 +63,14 @@ Na conta o `navigation()` tem efeito, porque as páginas leem o cookie de sessã
 - `apps/account/app/page.tsx`: `<Link href="/orders" prefetch>Orders</Link>`.
 - `apps/account/app/orders/page.tsx`, dois `<Suspense>` lado a lado:
   - `Cart`: `requireUserId()` e depois `getCartLines(userId)` (`'use cache'`, tag `user:<id>:cart`). Sem `navigation()`: entra no prefetch.
-  - `OrderHistory`: `requireUserId()`, **`await navigation()`**, depois `getOrders(userId)` (`'use cache'`, tag `user:<id>:orders`, 400 ms de `withLatency`). Fallback: "Loading orders…"; conteúdo: região "Order history" com as linhas `order-row`.
+  - `OrderHistory`: `requireUserId()`, **`await navigation()`**, depois `getOrders(userId)` (`'use cache'`, tag `user:<id>:orders`, 400 ms de `withLatency`). Fallback: "Carregando pedidos…"; conteúdo: região "Histórico de pedidos" com as linhas `order-row`.
 - O id do usuário é lido fora do escopo cacheado e passado como argumento (`apps/account/lib/data.ts`), como a doc de `navigation()` recomenda.
 
 ### Medido no build de produção
 
 Interceptando as requisições RSC de `/account/orders` depois do login como Ana (banco recém-resetado, sem pedidos):
 
-| Requisição | `x-nextjs-prerender` | Tamanho | Carrinho | "Order history" | "Loading orders…" |
+| Requisição | `x-nextjs-prerender` | Tamanho | Carrinho | "Histórico de pedidos" | "Carregando pedidos…" |
 | --- | --- | --- | --- | --- | --- |
 | `_tree` (`next-router-segment-prefetch: /_tree`) | `1` | 319 B | não | não | não |
 | App Shell em tempo de execução (`next-router-prefetch: 3`) | ausente | 2,2 KB | sim | **não** | sim |
@@ -79,16 +79,16 @@ Interceptando as requisições RSC de `/account/orders` depois do login como Ana
 
 Os dois prefetches não têm `x-nextjs-prerender`: foram renderizados na hora, com o cookie. Ambos trazem o carrinho e o fallback do histórico, mas não o histórico. Só a navegação o traz.
 
-**Mutação** (tirar o `await navigation()` de `OrderHistory`, rebuild): o App Shell (`next-router-prefetch: 3`, 2,4 KB) passa a conter "Order history"; o router nem pede o prefetch por link, e o clique não faz requisição nenhuma para `/account/orders` (tudo já estava no cliente). O teste falha:
+**Mutação** (tirar o `await navigation()` de `OrderHistory`, rebuild): o App Shell (`next-router-prefetch: 3`, 2,4 KB) passa a conter "Histórico de pedidos"; o router nem pede o prefetch por link, e o clique não faz requisição nenhuma para `/account/orders` (tudo já estava no cliente). O teste falha:
 
 ```text
 Error: expect(locator).toBeVisible() failed
-Locator: getByText('Loading orders…')
+Locator: getByText('Carregando pedidos…')
 Expected: visible
 Error: element(s) not found
 ```
 
-e o snapshot da página no instante do clique mostra `region "Order history"` com "No orders yet." já renderizado.
+e o snapshot da página no instante do clique mostra `region "Histórico de pedidos"` com "Nenhum pedido ainda." já renderizado.
 
 ### Diferença para o catálogo
 
@@ -97,5 +97,5 @@ No catálogo, todo prefetch vinha de saída estática (`x-nextjs-prerender: 1`),
 ### Como observar
 
 1. `pnpm prod`, entre como Ana. Na página `/account`, DevTools › Network filtrado por `_rsc`: aparecem os prefetches de `/account/orders`.
-2. Clique em "Orders": título e carrinho aparecem na hora; "Loading orders…" aparece até o histórico chegar (na primeira leitura, com os 400 ms de latência simulada).
-3. `e2e/account.spec.ts` › "order history waits for navigation (navigation())": dentro do `instant()`, `<h1>` "Orders" e região "Cart" visíveis, "Loading orders…" visível e nenhuma região "Order history"; depois do escopo, o histórico aparece.
+2. Clique em "Pedidos": título e carrinho aparecem na hora; "Carregando pedidos…" aparece até o histórico chegar (na primeira leitura, com os 400 ms de latência simulada).
+3. `e2e/account.spec.ts` › "order history waits for navigation (navigation())": dentro do `instant()`, `<h1>` "Pedidos" e região "Carrinho" visíveis, "Carregando pedidos…" visível e nenhuma região "Histórico de pedidos"; depois do escopo, o histórico aparece.

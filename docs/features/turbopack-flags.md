@@ -16,7 +16,7 @@ Next 16.4.3. Os três nomes e valores conferem com `config-shared.d.ts`; a opç�
 
 - `apps/account/next.config.ts`: as três flags.
 - `apps/account/app/components/PlaceOrderButton.tsx`: o `import("canvas-confetti")` dinâmico depois de um pedido bem-sucedido, que dá ao lazy import um alvo real. `canvas-confetti` 1.9.4 (e `@types/canvas-confetti` 1.9.0) estão fixados na conta.
-- `e2e/confetti.spec.ts`: prova que o chunk do confete não é carregado na abertura da página e chega depois do clique em "Place order".
+- `e2e/confetti.spec.ts`: prova que o chunk do confete não é carregado na abertura da página e chega depois do clique em "Fazer pedido".
 
 ## Como observar
 

@@ -5,18 +5,16 @@ for (const path of ["/", "/catalog/pt", "/account"]) {
     await page.goto(path);
     const header = page.getByRole("banner");
     await expect(header).toBeVisible();
-    await expect(header.getByRole("link", { name: "Home" })).toHaveAttribute(
+    await expect(header.getByRole("link", { name: "Início" })).toHaveAttribute(
       "href",
       "/",
     );
-    await expect(header.getByRole("link", { name: "Catalog" })).toHaveAttribute(
-      "href",
-      "/catalog/pt",
-    );
-    await expect(header.getByRole("link", { name: "Account" })).toHaveAttribute(
-      "href",
-      "/account",
-    );
+    await expect(
+      header.getByRole("link", { name: "Catálogo" }),
+    ).toHaveAttribute("href", "/catalog/pt");
+    await expect(
+      header.getByRole("link", { name: "Minha conta" }),
+    ).toHaveAttribute("href", "/account");
     await expect(page.getByRole("contentinfo")).toBeVisible();
   });
 }

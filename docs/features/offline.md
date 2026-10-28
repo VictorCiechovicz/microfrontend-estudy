@@ -13,9 +13,9 @@ A checagem de conectividade é um `HEAD` na URL atual com header RSC, cancelado 
 ## Onde no código
 
 - `apps/account/next.config.ts`: `experimental.useOffline: true`.
-- `apps/account/app/components/OfflineBanner.tsx`: Client Component no layout raiz; com `useOffline()` verdadeiro mostra `role="status"` "You are offline. Pending requests will retry once you are back online."
-- `apps/account/app/components/PlaceOrderButton.tsx`: `useTransition` + `useOffline`. O rótulo é "Place order"; pendente, "Placing order…"; pendente e offline, "Placing order (offline, will retry)…". O resultado da action vira um `role="status"` ("Order #N placed" ou "Cart is empty"); se a action lançar, o botão mostra "Could not place the order. Try again." em vez de cair na página de erro.
-- `apps/account/app/orders/page.tsx`: o botão fica na seção "Cart", acima do histórico.
+- `apps/account/app/components/OfflineBanner.tsx`: Client Component no layout raiz; com `useOffline()` verdadeiro mostra `role="status"` "Você está offline. As requisições pendentes serão reenviadas quando a conexão voltar."
+- `apps/account/app/components/PlaceOrderButton.tsx`: `useTransition` + `useOffline`. O rótulo é "Fazer pedido"; pendente, "Enviando pedido…"; pendente e offline, "Enviando pedido (offline, vai tentar de novo)…". O resultado da action vira um `role="status"` ("Pedido #N realizado", ou "Seu carrinho está vazio." quando a action devolve `{ error: "Cart is empty" }`); se a action lançar, o botão mostra "Não foi possível fazer o pedido. Tente de novo." em vez de cair na página de erro.
+- `apps/account/app/orders/page.tsx`: o botão fica na seção "Carrinho", acima do histórico.
 - `apps/account/app/api/cart/route.ts`: `GET`/`POST`/`DELETE /account/api/cart`, usado pelo teste para pôr o produto 8 no carrinho (ver abaixo).
 
 ## API do carrinho
@@ -32,6 +32,6 @@ Existe porque o teste offline precisa encher o carrinho; o catálogo e o widget 
 ## Como observar
 
 1. `pnpm prod`, entre como Ana, ponha um produto no carrinho e abra `http://localhost:3000/account/orders`.
-2. DevTools › Network › **Offline**. Clique em "Place order": aparecem o banner e "Placing order (offline, will retry)…".
+2. DevTools › Network › **Offline**. Clique em "Fazer pedido": aparecem o banner e "Enviando pedido (offline, vai tentar de novo)…".
 3. Volte para **No throttling**: em até ~3 s a action é reenviada, o pedido entra no histórico, o carrinho esvazia e o banner some.
 4. `e2e/account.spec.ts` › "place order while offline completes when back online" (`context.setOffline(true/false)` do Playwright): confere o rótulo, o banner, uma linha a mais no histórico e o banner sumindo. Usa o produto 8, que é da conta (os outros specs não dependem do estoque dele).

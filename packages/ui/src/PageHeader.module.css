@@ -1,0 +1,36 @@
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.text {
+  max-width: 46rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--lab-zone);
+  font-size: var(--lab-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+}
+
+.lead {
+  margin: 0.5rem 0 0;
+  color: var(--lab-text-muted);
+  font-size: var(--lab-text-lg);
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}

@@ -2,7 +2,7 @@
 
 ## O que é
 
-Um slot `@modal` no layout raiz da conta é uma segunda árvore de rotas renderizada ao lado de `children`. Dentro dele, `(.)orders/[id]` **intercepta** `/orders/[id]`: numa navegação no cliente a partir da lista, o detalhe abre como modal por cima de "Orders", com a URL `/account/orders/<id>`. Numa carga completa da mesma URL (reload, link colado), não há interceptação: `children` renderiza a página `orders/[id]` inteira e o slot cai no `default.tsx`.
+Um slot `@modal` no layout raiz da conta é uma segunda árvore de rotas renderizada ao lado de `children`. Dentro dele, `(.)orders/[id]` **intercepta** `/orders/[id]`: numa navegação no cliente a partir da lista, o detalhe abre como modal por cima de "Pedidos", com a URL `/account/orders/<id>`. Numa carga completa da mesma URL (reload, link colado), não há interceptação: `children` renderiza a página `orders/[id]` inteira e o slot cai no `default.tsx`.
 
 ## Versão
 
@@ -26,7 +26,7 @@ O usuário entra por `http://localhost:3000`, e o shell repassa `/account/*` por
 ## Como observar
 
 1. `pnpm prod`, entre como Ana, ponha algo no carrinho (botão do catálogo, ou `POST /account/api/cart`) e faça um pedido em `/account/orders`.
-2. Clique em "Order #N": abre o modal, o `<h1>` "Orders" continua atrás e a URL muda para `/account/orders/N`.
+2. Clique em "Pedido #N": abre o modal, o `<h1>` "Pedidos" continua atrás e a URL muda para `/account/orders/N`.
 3. O fundo escuro do modal cobre a página, então pela tela só se sai dele por "Close" ou pelo voltar. O teste dispara o clique direto no `<Link>` do badge do header (`dispatchEvent("click")`) para exercitar uma navegação suave com o modal aberto: a URL vira `/account/notifications` e o modal fecha por causa do `[...catchAll]`; voltar no navegador reabre o modal.
 4. Recarregue: some o modal, e a página mostra `<h1>Order #N</h1>`. "Close" (ou o voltar do navegador) fecha o modal.
 5. `e2e/account.spec.ts` › "order detail opens as modal from list and as page on reload".

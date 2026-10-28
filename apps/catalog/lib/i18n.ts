@@ -29,6 +29,28 @@ const MESSAGES = {
     errorLabDevOnly: "Disponível apenas em next dev.",
     errorLabCauseChain: "Provocar erro com causa encadeada",
     errorLabHydration: "Provocar hydration mismatch",
+    guides: "Guias",
+    guidesLead: "Textos de apoio escritos em Markdown e lidos no build.",
+    readGuide: "Ler guia",
+    backToGuides: "← Todos os guias",
+    catalogEyebrow: "Zona catálogo",
+    catalogLead:
+      "Produtos servidos pela zona catálogo. Clique em um para ver o detalhe com estoque, avaliações e recomendados.",
+    featured: "Destaque",
+    allProducts: "Todos os produtos",
+    backToCatalog: "← Catálogo",
+    description: "Descrição",
+    stockHeading: "Estoque",
+    reviewCount: "{n} avaliações",
+    adminLead:
+      "Mude o preço de um produto. A lista do catálogo atualiza na hora; a página do produto mostra o preço antigo uma vez e depois o novo.",
+    adminLoginLead: "Entre com um usuário para editar preços.",
+    priceHint: "Ex.: 1999 para R$ 19,99",
+    errorLabLead:
+      "Erros provocados de propósito para ver o overlay de erros do Next 16: causa encadeada (Error.cause) e hydration mismatch.",
+    errorLabHowTo:
+      "Rode o catálogo com pnpm dev e volte a esta página para ver os botões.",
+    notFoundTitle: "Página não encontrada",
   },
   en: {
     catalog: "Catalog",
@@ -56,6 +78,28 @@ const MESSAGES = {
     errorLabDevOnly: "Only available in next dev.",
     errorLabCauseChain: "Trigger error with chained cause",
     errorLabHydration: "Trigger hydration mismatch",
+    guides: "Guides",
+    guidesLead: "Help texts written in Markdown and read at build time.",
+    readGuide: "Read guide",
+    backToGuides: "← All guides",
+    catalogEyebrow: "Catalog zone",
+    catalogLead:
+      "Products served by the catalog zone. Click one to see its detail with stock, reviews and recommendations.",
+    featured: "Featured",
+    allProducts: "All products",
+    backToCatalog: "← Catalog",
+    description: "Description",
+    stockHeading: "Stock",
+    reviewCount: "{n} reviews",
+    adminLead:
+      "Change a product's price. The catalog list updates at once; the product page shows the old price once and then the new one.",
+    adminLoginLead: "Log in with a user to edit prices.",
+    priceHint: "E.g. 1999 for $19.99",
+    errorLabLead:
+      "Errors triggered on purpose to see the Next 16 error overlay: chained cause (Error.cause) and hydration mismatch.",
+    errorLabHowTo:
+      "Run the catalog with pnpm dev and come back to this page to see the buttons.",
+    notFoundTitle: "Page not found",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 
