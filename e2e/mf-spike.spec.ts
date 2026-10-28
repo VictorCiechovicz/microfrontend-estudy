@@ -19,6 +19,8 @@ test("remote widget renders inside catalog zone", async ({ page }) => {
 test("page still renders when widgets remote is down", async ({ page }) => {
   await page.route("http://localhost:3003/**", (r) => r.abort());
   await page.goto("/catalog/pt");
-  await expect(page.getByRole("heading", { name: "Catalog" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /Catálogo|Catalog/ }),
+  ).toBeVisible();
   await expect(page.getByTestId("widget-fallback")).toBeVisible();
 });

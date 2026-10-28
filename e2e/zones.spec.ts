@@ -13,7 +13,9 @@ test("shell serves home", async ({ page }) => {
 
 test("catalog zone is served under /catalog", async ({ page }) => {
   await page.goto("/catalog/pt");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Catalog");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    /Catálogo|Catalog/,
+  );
   await expect(page.locator("html")).toHaveAttribute("data-zone", "catalog");
 });
 

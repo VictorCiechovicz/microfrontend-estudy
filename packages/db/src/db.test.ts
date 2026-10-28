@@ -14,6 +14,7 @@ import {
   resetDb,
   unreadCount,
 } from "./index.ts";
+import { isLang } from "./langs.ts";
 
 let dir: string;
 
@@ -55,4 +56,11 @@ test("injected stock fault fails once then recovers", () => {
 
 test("getProduct unknown id returns null", () => {
   expect(getProduct(9999, "pt")).toBeNull();
+});
+
+test("isLang accepts only supported languages", () => {
+  expect(isLang("pt")).toBe(true);
+  expect(isLang("en")).toBe(true);
+  expect(isLang("xx")).toBe(false);
+  expect(isLang(undefined)).toBe(false);
 });

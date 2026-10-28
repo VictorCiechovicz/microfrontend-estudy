@@ -1,6 +1,14 @@
 import { SiteFooter, SiteHeader } from "@lab/ui";
+import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
+import { currentLang } from "../../../lib/i18n";
 import { UserSlot } from "../../components/UserSlot";
+
+export const ensureStatic = "prefetch";
+
+export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),
+};
 
 export function generateStaticParams() {
   return [{ lang: "pt" }, { lang: "en" }];
@@ -8,14 +16,11 @@ export function generateStaticParams() {
 
 export default async function CatalogLayout({
   children,
-  params,
 }: {
   children: ReactNode;
-  params: Promise<{ lang: string }>;
 }) {
-  const { lang } = await params;
   return (
-    <html lang={lang} data-zone="catalog">
+    <html lang={await currentLang()} data-zone="catalog">
       <body>
         <SiteHeader
           zone="catalog"

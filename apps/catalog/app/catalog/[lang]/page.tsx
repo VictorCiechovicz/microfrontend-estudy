@@ -1,27 +1,36 @@
-import { getProduct, type Lang } from "@lab/db";
 import { RemoteWidget } from "@lab/mf-host";
 import { Price } from "@lab/ui";
 import Link from "next/link";
+import { getProductList } from "../../../lib/data";
+import { currentLang, t } from "../../../lib/i18n";
 
-export default async function CatalogPage({
-  params,
-}: {
-  params: Promise<{ lang: string }>;
-}) {
-  const { lang } = await params;
-  const priceLang: Lang = lang === "en" ? "en" : "pt";
-  const product = getProduct(1, priceLang);
+export default async function CatalogPage() {
+  const lang = await currentLang();
+  const [featured, ...rest] = await getProductList();
   return (
     <main>
-      <h1>Catalog</h1>
+      <h1>{await t("catalog")}</h1>
       <nav>
         <Link href={`/catalog/${lang}/guides`}>Guides</Link>
       </nav>
-      {product ? (
+      {featured ? (
         <p data-testid="featured-price">
-          {product.name}: <Price cents={product.priceCents} lang={priceLang} />
+          <Link href={`/catalog/${lang}/products/${featured.id}`}>
+            {featured.name}
+          </Link>
+          : <Price cents={featured.priceCents} lang={lang} />
         </p>
       ) : null}
+      <ul>
+        {rest.map((product) => (
+          <li key={product.id}>
+            <Link href={`/catalog/${lang}/products/${product.id}`}>
+              {product.name}
+            </Link>{" "}
+            <Price cents={product.priceCents} lang={lang} />
+          </li>
+        ))}
+      </ul>
       <RemoteWidget name="HelloWidget" />
     </main>
   );
