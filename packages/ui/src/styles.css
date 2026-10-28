@@ -27,6 +27,9 @@
   --lab-danger-soft: #fdecec;
   --lab-warning: #b45309;
   --lab-warning-soft: #fef5e4;
+  --lab-study: #a16207;
+  --lab-study-soft: #fffaeb;
+  --lab-study-border: #ead9a8;
 
   --lab-zone: var(--lab-shell);
   --lab-zone-soft: var(--lab-shell-soft);
@@ -243,6 +246,41 @@ tfoot th {
 
 .lab-remote {
   display: contents;
+}
+
+html[data-study="on"] .lab-remote {
+  position: relative;
+  display: block;
+  outline: 2px dashed var(--lab-widgets);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+html[data-study="on"] .lab-remote::before {
+  content: "Module Federation · widgets@:3003 · " attr(data-remote-widget);
+  position: absolute;
+  z-index: 2;
+  left: -4px;
+  bottom: calc(100% + 6px);
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  background: var(--lab-widgets);
+  color: #fff;
+  font-family: var(--lab-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+html[data-study="on"] header .lab-remote::before {
+  bottom: auto;
+  top: calc(100% + 8px);
+}
+
+html[data-study="on"] [data-header-zone] {
+  box-shadow: inset 0 -2px 0 var(--lab-zone);
 }
 
 .lab-signin {

@@ -2,6 +2,7 @@
 
 import type { Lang } from "@lab/db/langs";
 import { Button } from "@lab/ui";
+import { announceCacheReport } from "@lab/ui/study";
 import { useState } from "react";
 import styles from "../catalog.module.css";
 import { type SetPriceResult, setPriceAction } from "./actions";
@@ -26,7 +27,9 @@ export function PriceForm({
   const [result, setResult] = useState<SetPriceResult | null>(null);
 
   async function submit(formData: FormData) {
-    setResult(await setPriceAction(formData));
+    const next = await setPriceAction(formData);
+    setResult(next);
+    if (next.ok) announceCacheReport(next.cache);
   }
 
   return (

@@ -1,11 +1,11 @@
 import { listNotifications } from "@lab/db";
-import { Button, EmptyState, PageHeader, Skeleton } from "@lab/ui";
+import { EmptyState, PageHeader, Skeleton } from "@lab/ui";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { requireUserId } from "../../lib/session";
 import styles from "../components/account.module.css";
-import { markReadAction } from "./actions";
+import { MarkReadButton } from "./MarkReadButton";
 
 const DATE = new Intl.DateTimeFormat("pt-BR", {
   dateStyle: "short",
@@ -59,11 +59,7 @@ async function NotificationList() {
           {notification.read ? (
             <span className={styles.readTag}>Lida</span>
           ) : (
-            <form action={markReadAction.bind(null, notification.id)}>
-              <Button type="submit" variant="secondary" size="sm">
-                Marcar como lida
-              </Button>
-            </form>
+            <MarkReadButton id={notification.id} />
           )}
         </li>
       ))}

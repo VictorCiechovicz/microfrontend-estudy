@@ -152,7 +152,9 @@ test("order history waits for navigation (navigation())", async ({ page }) => {
     await page.waitForURL((url) => url.pathname === "/account/orders");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pedidos");
     await expect(page.getByRole("region", { name: "Carrinho" })).toBeVisible();
-    await expect(page.getByText("Carregando pedidos…")).toBeVisible();
+    await expect(
+      page.getByText("Carregando pedidos…", { exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByRole("region", { name: "Histórico de pedidos" }),
     ).toHaveCount(0);
@@ -204,8 +206,25 @@ test.describe("cart API", () => {
       ),
     );
 
+    expect(body.cache).toEqual({
+      zone: "account",
+      local: [
+        { kind: "revalidateTag", tag: "user:1:cart", profile: "{ expire: 0 }" },
+      ],
+      broadcast: {
+        tags: ["user:1:cart"],
+        results: [
+          { zone: "shell", ok: true },
+          { zone: "catalog", ok: true },
+        ],
+      },
+    });
+
     const listed = await page.request.get("/account/api/cart");
-    expect(await listed.json()).toEqual(body);
+    expect(await listed.json()).toEqual({
+      lines: body.lines,
+      totalCents: body.totalCents,
+    });
 
     const removed = await page.request.delete(
       `/account/api/cart?productId=${OFFLINE_PRODUCT_ID}`,

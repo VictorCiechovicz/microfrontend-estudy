@@ -1,0 +1,301 @@
+.root {
+  --study: var(--lab-study, #a16207);
+  --study-soft: var(--lab-study-soft, #fffaeb);
+  --study-border: var(--lab-study-border, #ead9a8);
+  font-size: var(--lab-text-sm, 0.875rem);
+}
+
+.dock {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem 0.45rem 0.45rem;
+  border: 1px solid var(--study-border);
+  border-radius: 999px;
+  background: var(--lab-surface, #fff);
+  color: var(--lab-text, #1c2230);
+  font: inherit;
+  font-weight: 600;
+  box-shadow: var(--lab-shadow-lg, 0 12px 32px rgb(16 24 40 / 0.14));
+  cursor: pointer;
+  transition:
+    border-color 120ms,
+    background 120ms;
+}
+
+.fab:hover {
+  border-color: var(--study);
+}
+
+.fab[aria-pressed="true"] {
+  border-color: var(--study);
+  background: var(--study-soft);
+}
+
+.fab:focus-visible,
+.reopen:focus-visible,
+.iconButton:focus-visible {
+  outline: 2px solid var(--study);
+  outline-offset: 2px;
+}
+
+.fabIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--study);
+  color: #fff;
+}
+
+.fabIcon svg {
+  width: 1rem;
+  height: 1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.fabState {
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--lab-surface-muted, #f8f9fb);
+  color: var(--lab-text-subtle, #8a92a1);
+  font-family: var(--lab-mono, monospace);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 500;
+}
+
+.fab[aria-pressed="true"] .fabState {
+  background: var(--study);
+  color: #fff;
+}
+
+.reopen {
+  padding: 0.4rem 0.8rem;
+  border: 1px dashed var(--study);
+  border-radius: 999px;
+  background: var(--lab-surface, #fff);
+  color: var(--study);
+  font: inherit;
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.panel {
+  position: fixed;
+  right: 16px;
+  bottom: 4.5rem;
+  z-index: 55;
+  width: min(23rem, calc(100vw - 32px));
+  max-height: calc(100vh - 10rem);
+  overflow-y: auto;
+  border: 1px solid var(--study-border);
+  border-radius: var(--lab-radius-lg, 14px);
+  background: var(--lab-surface, #fff);
+  box-shadow: var(--lab-shadow-lg, 0 12px 32px rgb(16 24 40 / 0.14));
+  animation: panel-in 180ms ease-out;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+}
+
+.panelHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.75rem 0.6rem 1rem;
+  border-bottom: 1px solid var(--study-border);
+  background: var(--study-soft);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 8px,
+    rgb(161 98 7 / 0.05) 8px 9px
+  );
+}
+
+.kicker {
+  font-family: var(--lab-mono, monospace);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--study);
+}
+
+.iconButton {
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--study-border);
+  border-radius: 50%;
+  background: var(--lab-surface, #fff);
+  color: var(--study);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.section {
+  padding: 0.85rem 1rem;
+}
+
+.section + .section {
+  border-top: 1px dashed var(--lab-border, #e2e5ea);
+}
+
+.heading {
+  margin: 0 0 0.45rem;
+  color: var(--lab-text-muted, #5b6475);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.zoneLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--lab-zone-soft, #eef1f5);
+  color: var(--lab-zone, #475569);
+  font-family: var(--lab-mono, monospace);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 700;
+}
+
+.zoneDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.text,
+.muted,
+.arrival {
+  margin: 0 0 0.45rem;
+  line-height: 1.5;
+}
+
+.text:last-child,
+.muted:last-child {
+  margin-bottom: 0;
+}
+
+.muted {
+  color: var(--lab-text-muted, #5b6475);
+  font-size: var(--lab-text-xs, 0.75rem);
+}
+
+.root code {
+  padding: 0.02rem 0.28rem;
+  border-radius: 4px;
+  background: var(--lab-surface-muted, #f3f4f6);
+  font-size: 0.82em;
+  overflow-wrap: anywhere;
+}
+
+.counterRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.counter {
+  min-width: 2.5rem;
+  color: var(--study);
+  font-family: var(--lab-mono, monospace);
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.counterLabel {
+  color: var(--lab-text-muted, #5b6475);
+}
+
+.arrival {
+  padding: 0.5rem 0.65rem;
+  border-left: 3px solid var(--study);
+  border-radius: 0 var(--lab-radius-sm, 6px) var(--lab-radius-sm, 6px) 0;
+  background: var(--study-soft);
+}
+
+.widgets,
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin: 0 0 0.45rem;
+  padding: 0;
+  list-style: none;
+}
+
+.widgets li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0.55rem;
+  border: 1px dashed var(--lab-widgets, #7c3aed);
+  border-radius: var(--lab-radius-sm, 6px);
+  background: var(--lab-widgets-soft, #f3eefe);
+  color: var(--lab-widgets, #7c3aed);
+  font-family: var(--lab-mono, monospace);
+  font-size: var(--lab-text-xs, 0.75rem);
+}
+
+.widgets code {
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.notes a {
+  color: var(--study);
+  font-weight: 600;
+}
+
+.panelFoot {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem 1rem;
+  border-top: 1px solid var(--study-border);
+  background: var(--lab-surface-muted, #f8f9fb);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 600;
+}
+
+.panelFoot a {
+  color: var(--study);
+}

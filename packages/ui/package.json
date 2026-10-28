@@ -8,20 +8,31 @@
   ],
   "exports": {
     ".": "./src/index.ts",
+    "./study": "./src/study/index.ts",
     "./styles.css": "./src/styles.css"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@lab/cache-sync": "workspace:*"
+  },
   "peerDependencies": {
+    "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@lab/tsconfig": "workspace:*",
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
+    "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "typescript": "7.0.2"

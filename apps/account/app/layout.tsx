@@ -1,6 +1,7 @@
 import { RemoteWidget } from "@lab/mf-host";
 import { SiteFooter, SiteHeader } from "@lab/ui";
 import "@lab/ui/styles.css";
+import { StudyMode } from "@lab/ui/study";
 import { type ReactNode, Suspense } from "react";
 import { NotificationBadge } from "./components/NotificationBadge";
 import { OfflineBanner } from "./components/OfflineBanner";
@@ -34,6 +35,7 @@ export default function RootLayout({
         {children}
         {modal}
         <SiteFooter />
+        <StudyMode zone="account" />
       </body>
     </html>
   );

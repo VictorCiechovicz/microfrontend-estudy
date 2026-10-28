@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@lab/ui";
+import { announceCacheReport } from "@lab/ui/study";
 import { useOffline } from "next/offline";
 import { useState, useTransition } from "react";
 import { placeOrderAction } from "../orders/actions";
@@ -25,6 +26,7 @@ export function PlaceOrderButton() {
           tone: "success",
           text: `Pedido #${result.orderId} realizado`,
         });
+        announceCacheReport(result.cache);
         void import("canvas-confetti").then(({ default: confetti }) => {
           confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
         });

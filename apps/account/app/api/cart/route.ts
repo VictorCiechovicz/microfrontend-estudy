@@ -1,4 +1,4 @@
-import { broadcastInvalidation, tags } from "@lab/cache-sync";
+import { broadcastInvalidation, type CacheReport, tags } from "@lab/cache-sync";
 import {
   addToCart,
   type CartLine,
@@ -13,13 +13,18 @@ import { getSessionUserId } from "../../../lib/session";
 
 type CartBody = { lines: CartLine[]; totalCents: number };
 
-function cartOf(userId: number): NextResponse<CartBody> {
+function cartOf(
+  userId: number,
+  cache?: CacheReport,
+): NextResponse<CartBody & { cache?: CacheReport }> {
   const lines = getCart(userId);
   const totalCents = lines.reduce(
     (sum, line) => sum + line.priceCents * line.qty,
     0,
   );
-  return NextResponse.json({ lines, totalCents });
+  return NextResponse.json(
+    cache ? { lines, totalCents, cache } : { lines, totalCents },
+  );
 }
 
 function isPositiveInt(value: unknown): value is number {
@@ -35,9 +40,15 @@ const unauthenticated = () =>
 const badRequest = (error: string) =>
   NextResponse.json({ error }, { status: 400 });
 
-async function invalidateCart(userId: number) {
-  revalidateTag(tags.userCart(userId), { expire: 0 });
-  await broadcastInvalidation([tags.userCart(userId)], { from: "account" });
+async function invalidateCart(userId: number): Promise<CacheReport> {
+  const tag = tags.userCart(userId);
+  revalidateTag(tag, { expire: 0 });
+  const results = await broadcastInvalidation([tag], { from: "account" });
+  return {
+    zone: "account",
+    local: [{ kind: "revalidateTag", tag, profile: "{ expire: 0 }" }],
+    broadcast: { tags: [tag], results },
+  };
 }
 
 export async function GET() {
@@ -60,8 +71,7 @@ export async function POST(request: Request) {
     return badRequest("invalid qty");
   }
   addToCart(userId, id, qty);
-  await invalidateCart(userId);
-  return cartOf(userId);
+  return cartOf(userId, await invalidateCart(userId));
 }
 
 export async function DELETE(request: Request) {
@@ -71,6 +81,5 @@ export async function DELETE(request: Request) {
   const id = parseProductId(/^\d+$/.test(raw) ? Number(raw) : null);
   if (id === null) return badRequest("invalid productId");
   removeFromCart(userId, id);
-  await invalidateCart(userId);
-  return cartOf(userId);
+  return cartOf(userId, await invalidateCart(userId));
 }

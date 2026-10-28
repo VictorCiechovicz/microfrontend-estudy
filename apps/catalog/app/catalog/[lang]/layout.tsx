@@ -1,6 +1,7 @@
 import { RemoteWidget } from "@lab/mf-host";
 import { SiteFooter, SiteHeader } from "@lab/ui";
 import "@lab/ui/styles.css";
+import { StudyMode } from "@lab/ui/study";
 import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
 import { currentLang } from "../../../lib/i18n";
@@ -42,6 +43,7 @@ export default async function CatalogLayout({
         />
         {children}
         <SiteFooter />
+        <StudyMode zone="catalog" />
       </body>
     </html>
   );

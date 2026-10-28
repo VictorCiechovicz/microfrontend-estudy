@@ -1,12 +1,14 @@
 "use client";
 
+import type { CacheReport } from "@lab/cache-sync";
 import { Button } from "@lab/ui";
+import { announceCacheReport } from "@lab/ui/study";
 import { useState } from "react";
 import styles from "./product.module.css";
 
 const CART_CHANGED = "lab:cart-changed";
 
-type CartBody = { lines: { qty: number }[] };
+type CartBody = { lines: { qty: number }[]; cache?: CacheReport };
 
 export function AddToCart({
   productId,
@@ -42,6 +44,7 @@ export function AddToCart({
     const count = body.lines.reduce((sum, line) => sum + line.qty, 0);
     window.dispatchEvent(new CustomEvent(CART_CHANGED, { detail: { count } }));
     setStatus("idle");
+    if (body.cache) announceCacheReport(body.cache);
   }
 
   return (

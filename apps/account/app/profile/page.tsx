@@ -1,10 +1,10 @@
-import { Button, Card, PageHeader, Skeleton } from "@lab/ui";
+import { Card, PageHeader, Skeleton } from "@lab/ui";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getProfile } from "../../lib/data";
 import { requireUserId } from "../../lib/session";
 import styles from "../components/account.module.css";
-import { updateProfileAction } from "./actions";
+import { ProfileForm as ProfileFormFields } from "./ProfileForm";
 
 export default function ProfilePage() {
   return (
@@ -29,13 +29,5 @@ export default function ProfilePage() {
 async function ProfileForm() {
   const userId = await requireUserId();
   const profile = await getProfile(userId);
-  return (
-    <form action={updateProfileAction} className={styles.form}>
-      <label className={styles.field}>
-        Nome
-        <input name="name" defaultValue={profile?.name} required />
-      </label>
-      <Button type="submit">Salvar</Button>
-    </form>
-  );
+  return <ProfileFormFields name={profile?.name} />;
 }

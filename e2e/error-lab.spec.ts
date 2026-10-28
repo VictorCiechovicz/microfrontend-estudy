@@ -15,7 +15,7 @@ for (const lang of ["pt", "en"] as const) {
       COPY[lang].title,
     );
     await expect(page.getByRole("main")).toContainText(COPY[lang].notice);
-    await expect(page.getByRole("button")).toHaveCount(0);
+    await expect(page.getByRole("main").getByRole("button")).toHaveCount(0);
   });
 }
 
