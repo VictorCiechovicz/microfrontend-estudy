@@ -1,3 +1,5 @@
+export const ensureStatic = "navigation";
+
 export default function HomePage() {
   return (
     <main>

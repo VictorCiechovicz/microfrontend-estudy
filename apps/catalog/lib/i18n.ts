@@ -25,6 +25,10 @@ const MESSAGES = {
     priceUpdated: "Produto {id} agora custa {cents} centavos",
     unknownProduct: "Produto desconhecido",
     invalidPrice: "Preço inválido",
+    errorLab: "Laboratório de erros",
+    errorLabDevOnly: "Disponível apenas em next dev.",
+    errorLabCauseChain: "Provocar erro com causa encadeada",
+    errorLabHydration: "Provocar hydration mismatch",
   },
   en: {
     catalog: "Catalog",
@@ -48,6 +52,10 @@ const MESSAGES = {
     priceUpdated: "Product {id} now costs {cents} cents",
     unknownProduct: "Unknown product",
     invalidPrice: "Invalid price",
+    errorLab: "Error lab",
+    errorLabDevOnly: "Only available in next dev.",
+    errorLabCauseChain: "Trigger error with chained cause",
+    errorLabHydration: "Trigger hydration mismatch",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 
