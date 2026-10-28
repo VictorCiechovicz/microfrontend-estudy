@@ -1,8 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { getNote } from "./lib/notes";
 import { CATALOG_URL } from "./lib/zone-urls";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  if (pathname.startsWith("/estudo/")) {
+    return getNote(pathname.slice("/estudo/".length))
+      ? NextResponse.next()
+      : NextResponse.rewrite(new URL("/_missing", request.url));
+  }
   if (
     pathname === "/account/internal" ||
     pathname.startsWith("/account/internal/")
@@ -18,5 +24,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/catalog/sale", "/account/internal/:path*"],
+  matcher: ["/catalog/sale", "/account/internal/:path*", "/estudo/:slug"],
 };

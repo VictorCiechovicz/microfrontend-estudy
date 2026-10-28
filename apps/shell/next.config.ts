@@ -5,6 +5,11 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@lab/ui", "@lab/db", "@lab/cache-sync", "@lab/mf-host"],
   cacheComponents: true,
   partialPrefetching: true,
+  turbopack: {
+    rules: {
+      "*.md": { condition: { query: "?raw" }, type: "text" },
+    },
+  },
   experimental: {
     agentUpgrade: "security",
     serverActions: {

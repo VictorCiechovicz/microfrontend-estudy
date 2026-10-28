@@ -23,6 +23,37 @@ async function turnStudyModeOn(page: Page) {
   await expect(page.getByTestId("study-panel")).toBeVisible();
 }
 
+test("home has a six-step study tour linking to real places and notes", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const tour = page.locator("#roteiro");
+  await expect(
+    tour.getByRole("heading", { level: 2, name: "Comece por aqui" }),
+  ).toBeVisible();
+  const steps = tour.getByTestId("study-step");
+  await expect(steps).toHaveCount(6);
+  for (const step of await steps.all()) {
+    await expect(step.getByRole("heading", { level: 3 })).not.toBeEmpty();
+    await expect(step.getByText("Faça", { exact: true })).toBeVisible();
+    await expect(step.getByText("Observe", { exact: true })).toBeVisible();
+    const place = await step.getByTestId("step-place").getAttribute("href");
+    expect(place).toMatch(/^\/(catalog|account)\//);
+    expect((await page.request.get(place ?? "")).status(), place ?? "").toBe(
+      200,
+    );
+    const notes = step.getByTestId("step-note");
+    expect(await notes.count()).toBeGreaterThan(0);
+    for (const note of await notes.all()) {
+      const href = await note.getAttribute("href");
+      expect(href).toMatch(/^\/estudo\/[a-z0-9-]+$/);
+      expect((await page.request.get(href ?? "")).status(), href ?? "").toBe(
+        200,
+      );
+    }
+  }
+});
+
 test("study panel names the zone that served each page", async ({ page }) => {
   await page.goto("/");
   await turnStudyModeOn(page);
@@ -132,4 +163,33 @@ test("placing an order shows the local invalidations and the zones notified", as
 
   await toast.getByRole("button", { name: "Fechar aviso de cache" }).click();
   await expect(toast).toHaveCount(0);
+});
+
+test("study notes render in the shell with working links between notes", async ({
+  page,
+}) => {
+  await page.goto("/estudo");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Notas de estudo",
+  );
+  expect(await page.getByTestId("note-card").count()).toBeGreaterThanOrEqual(
+    30,
+  );
+
+  await page.goto("/estudo/navigation-prefetch");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "navigation() e prefetch()",
+  );
+  await expect(
+    page.locator("#navigation-no-catálogo-sem-efeito-observável"),
+  ).toHaveText("navigation() no catálogo: sem efeito observável");
+  await page
+    .getByRole("article")
+    .getByRole("link", { name: "isr-shell.md" })
+    .click();
+  await expect(page).toHaveURL("/estudo/isr-shell");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("ISR");
+
+  const missing = await page.request.get("/estudo/nope");
+  expect(missing.status()).toBe(404);
 });

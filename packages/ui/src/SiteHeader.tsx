@@ -35,6 +35,9 @@ export function SiteHeader({
               {ZONES[id].nav}
             </a>
           ))}
+          <a href="/estudo" className={`${styles.navLink} ${styles.navStudy}`}>
+            Notas de estudo
+          </a>
         </nav>
         <span
           className={styles.chip}

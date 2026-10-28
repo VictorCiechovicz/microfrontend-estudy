@@ -61,6 +61,7 @@
 
 .nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.25rem;
 }
 
@@ -83,6 +84,14 @@
   background: var(--lab-zone-soft);
   color: var(--lab-zone);
   font-weight: 600;
+}
+
+.navStudy {
+  color: var(--lab-study);
+}
+
+.navStudy::before {
+  content: "◎ " / "";
 }
 
 .chip {
