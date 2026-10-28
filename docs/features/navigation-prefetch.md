@@ -26,11 +26,11 @@ A primeira versão desta tarefa punha o `prefetch()` em `Related`. Lá ele não 
 
 Detalhe observado no build de produção: o App Shell de um id que não está em `generateStaticParams` só sai sem "Populares" depois que o Next promove a página desse id (ISR, ver `isr-shell.md`). Na primeira vez, a resposta do prefetch é o "fallback shell" estático da rota (`x-nextjs-cache: MISS`, ≈ 5,6 KB), e esse prerender inclui o "Populares". O teste por isso visita o destino antes e espera o arquivo aparecer em `route-cache`.
 
-## `navigation()`: não tem efeito observável neste lab
+## `navigation()` no catálogo: sem efeito observável
 
 `apps/catalog/app/catalog/[lang]/products/[id]/Reviews.tsx` faz `await navigation()` como o brief pede, seguido da leitura sem cache das avaliações (`listReviews` com `withLatency`). Fallback: `t('loadingReviews')`, cada avaliação com `data-testid="review"`.
 
-Neste lab o `navigation()` não muda nada que se possa ver, e isso foi medido:
+No catálogo o `navigation()` não muda nada que se possa ver, e isso foi medido:
 
 1. **Avaliações sem cache, sem `navigation()`.** Os 7 testes de `e2e/instant.spec.ts` passam do mesmo jeito. Quem tira as avaliações do prefetch é a leitura sem cache: o prerender para no `setTimeout` do `withLatency`.
 2. **Avaliações com `'use cache'` (tag `product:<id>`), com e sem `navigation()`.** Nos dois casos as avaliações chegam junto com o prefetch por link, tanto em `products/2` (em `generateStaticParams`) quanto em `products/5` (gerado por ISR): a resposta `__PAGE__` (`x-nextjs-cache: HIT`, ≈ 8,5 KB) contém "Review 1 of product …" e, dentro do `instant()`, as avaliações aparecem e o "Carregando avaliações…" não.
@@ -43,7 +43,7 @@ A doc de `ensureStatic` diz que o nível definido num `page.tsx` vale para a rot
 
 Resultado no build de produção, navegando da lista dentro do `instant()`: nada mudou. As respostas `__PAGE__` de `products/2` e `products/5` continuaram com `x-nextjs-prerender: 1` e ≈ 8,6 KB, contendo "Review 1 of product …", e as 4 avaliações apareceram no instante do clique, sem "Carregando avaliações…". A página de produto não lê nada da requisição antes do `navigation()`, então o Next serve o prefetch por link a partir da saída estática por id (pré-renderizada no build ou promovida por ISR). E essa saída inclui o que está abaixo do `navigation()`, com ou sem `ensureStatic`.
 
-Pela doc de `navigation()`, o efeito só aparece quando o prefetch por link é renderizado na hora, o que acontece quando a rota lê `cookies()`/`headers()` acima do `navigation()`. O lab não tem esse caso na página de produto, e criar um só para isso ficou fora do escopo. A mudança foi revertida: `ensureStatic = 'prefetch'` voltou para o layout `[lang]`, e as avaliações voltaram a ser lidas sem cache.
+Pela doc de `navigation()`, o efeito só aparece quando o prefetch por link é renderizado na hora, o que acontece quando a rota lê `cookies()`/`headers()` acima do `navigation()`. O catálogo não tem esse caso na página de produto; a demonstração observável ficou na conta (seção abaixo). A mudança foi revertida: `ensureStatic = 'prefetch'` voltou para o layout `[lang]`, e as avaliações voltaram a ser lidas sem cache.
 
 ## Como observar
 
@@ -53,3 +53,49 @@ Pela doc de `navigation()`, o efeito só aparece quando o prefetch por link é r
    - "product title is instant, reviews stream after navigation": "Populares" já vem pronto pelo prefetch por link.
    - "popular block is out of the App Shell a default link loads": com só o App Shell, aparece o "Carregando populares…" e a região "Populares" não existe.
    - Tirar o `await prefetch()` de `Popular.tsx` faz este último falhar ("Carregando populares…" não aparece).
+
+## `navigation()` na conta: histórico de pedidos
+
+Na conta o `navigation()` tem efeito, porque as páginas leem o cookie de sessão **acima** dele. Uma rota que lê `cookies()` tem App Shell com dados da sessão, renderizado em tempo de execução ("Include session data in the shell", `02-guides/optimizing-prefetching.md`), e é nesse tipo de prefetch que o `navigation()` corta o que vem abaixo.
+
+### Onde no código
+
+- `apps/account/app/page.tsx`: `<Link href="/orders" prefetch>Orders</Link>`.
+- `apps/account/app/orders/page.tsx`, dois `<Suspense>` lado a lado:
+  - `Cart`: `requireUserId()` e depois `getCartLines(userId)` (`'use cache'`, tag `user:<id>:cart`). Sem `navigation()`: entra no prefetch.
+  - `OrderHistory`: `requireUserId()`, **`await navigation()`**, depois `getOrders(userId)` (`'use cache'`, tag `user:<id>:orders`, 400 ms de `withLatency`). Fallback: "Loading orders…"; conteúdo: região "Order history" com as linhas `order-row`.
+- O id do usuário é lido fora do escopo cacheado e passado como argumento (`apps/account/lib/data.ts`), como a doc de `navigation()` recomenda.
+
+### Medido no build de produção
+
+Interceptando as requisições RSC de `/account/orders` depois do login como Ana (banco recém-resetado, sem pedidos):
+
+| Requisição | `x-nextjs-prerender` | Tamanho | Carrinho | "Order history" | "Loading orders…" |
+| --- | --- | --- | --- | --- | --- |
+| `_tree` (`next-router-segment-prefetch: /_tree`) | `1` | 319 B | não | não | não |
+| App Shell em tempo de execução (`next-router-prefetch: 3`) | ausente | 2,2 KB | sim | **não** | sim |
+| Prefetch por link (`next-router-prefetch: 2`) | ausente | 2,3 KB | sim | **não** | sim |
+| Navegação (clique) | ausente | 5,0 KB | sim | sim | sim |
+
+Os dois prefetches não têm `x-nextjs-prerender`: foram renderizados na hora, com o cookie. Ambos trazem o carrinho e o fallback do histórico, mas não o histórico. Só a navegação o traz.
+
+**Mutação** (tirar o `await navigation()` de `OrderHistory`, rebuild): o App Shell (`next-router-prefetch: 3`, 2,4 KB) passa a conter "Order history"; o router nem pede o prefetch por link, e o clique não faz requisição nenhuma para `/account/orders` (tudo já estava no cliente). O teste falha:
+
+```text
+Error: expect(locator).toBeVisible() failed
+Locator: getByText('Loading orders…')
+Expected: visible
+Error: element(s) not found
+```
+
+e o snapshot da página no instante do clique mostra `region "Order history"` com "No orders yet." já renderizado.
+
+### Diferença para o catálogo
+
+No catálogo, todo prefetch vinha de saída estática (`x-nextjs-prerender: 1`), e a saída estática inclui o que está abaixo do `navigation()`. Na conta, o cookie lido acima do `navigation()` obriga o Next a renderizar o prefetch na hora, e aí o `navigation()` vale.
+
+### Como observar
+
+1. `pnpm prod`, entre como Ana. Na página `/account`, DevTools › Network filtrado por `_rsc`: aparecem os prefetches de `/account/orders`.
+2. Clique em "Orders": título e carrinho aparecem na hora; "Loading orders…" aparece até o histórico chegar (na primeira leitura, com os 400 ms de latência simulada).
+3. `e2e/account.spec.ts` › "order history waits for navigation (navigation())": dentro do `instant()`, `<h1>` "Orders" e região "Cart" visíveis, "Loading orders…" visível e nenhuma região "Order history"; depois do escopo, o histórico aparece.

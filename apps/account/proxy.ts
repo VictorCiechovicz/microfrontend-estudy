@@ -1,6 +1,9 @@
 import { type NextRequest, NextResponse } from "next/server";
 
 export function proxy(request: NextRequest) {
+  if (request.method === "POST" && request.headers.has("next-action")) {
+    return NextResponse.next();
+  }
   const session = request.cookies.get("lab_user")?.value;
   if (session && /^\d+$/.test(session)) return NextResponse.next();
   const login = request.nextUrl.clone();

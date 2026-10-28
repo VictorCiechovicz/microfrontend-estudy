@@ -1,0 +1,73 @@
+import { broadcastInvalidation, tags } from "@lab/cache-sync";
+import {
+  addToCart,
+  type CartLine,
+  getCart,
+  getProduct,
+  removeFromCart,
+} from "@lab/db";
+import { revalidateTag } from "next/cache";
+import { NextResponse } from "next/server";
+import { getSessionUserId } from "../../../lib/session";
+
+type CartBody = { lines: CartLine[]; totalCents: number };
+
+function cartOf(userId: number): NextResponse<CartBody> {
+  const lines = getCart(userId);
+  const totalCents = lines.reduce(
+    (sum, line) => sum + line.priceCents * line.qty,
+    0,
+  );
+  return NextResponse.json({ lines, totalCents });
+}
+
+function isPositiveInt(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value > 0;
+}
+
+function parseProductId(value: unknown): number | null {
+  return isPositiveInt(value) && getProduct(value, "en") ? value : null;
+}
+
+const unauthenticated = () =>
+  NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+const badRequest = (error: string) =>
+  NextResponse.json({ error }, { status: 400 });
+
+async function invalidateCart(userId: number) {
+  revalidateTag(tags.userCart(userId), { expire: 0 });
+  await broadcastInvalidation([tags.userCart(userId)], { from: "account" });
+}
+
+export async function GET() {
+  const userId = await getSessionUserId();
+  if (userId === null) return unauthenticated();
+  return cartOf(userId);
+}
+
+export async function POST(request: Request) {
+  const userId = await getSessionUserId();
+  if (userId === null) return unauthenticated();
+  const body: unknown = await request.json().catch(() => null);
+  if (typeof body !== "object" || body === null) {
+    return badRequest("invalid body");
+  }
+  const { productId, qty } = body as { productId?: unknown; qty?: unknown };
+  const id = parseProductId(productId);
+  if (id === null) return badRequest("invalid productId");
+  if (!isPositiveInt(qty)) return badRequest("invalid qty");
+  addToCart(userId, id, qty);
+  await invalidateCart(userId);
+  return cartOf(userId);
+}
+
+export async function DELETE(request: Request) {
+  const userId = await getSessionUserId();
+  if (userId === null) return unauthenticated();
+  const raw = new URL(request.url).searchParams.get("productId") ?? "";
+  const id = parseProductId(/^\d+$/.test(raw) ? Number(raw) : null);
+  if (id === null) return badRequest("invalid productId");
+  removeFromCart(userId, id);
+  await invalidateCart(userId);
+  return cartOf(userId);
+}

@@ -18,7 +18,7 @@ O protocolo é um cookie (`next-instant-navigation-testing`) gravado no contexto
 
 No `next dev` a API de teste vem ligada sozinha. O `pnpm e2e` roda contra build de produção, e lá ela só existe com `experimental.exposeTestingApiInProductionBuild` (16.2.0). Sem isso o cookie não trava nada. Ficou assim:
 
-- `apps/catalog/next.config.ts`: `exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === "1"`.
+- `apps/catalog/next.config.ts` e `apps/account/next.config.ts`: `exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === "1"`.
 - `package.json` (raiz): `e2e` faz `EXPOSE_TESTING_API=1 pnpm build`.
 - `turbo.json`: `build.env: ["EXPOSE_TESTING_API"]`, para a variável chegar ao `next build` e entrar no hash do cache do Turbo (senão um build sem a API seria reaproveitado). O `pnpm prod` continua gerando o build sem ela.
 
@@ -32,6 +32,7 @@ O brief usa `getByRole('link', { name: /Produto 2/ })`. Com 12 produtos no seed,
 
 - `e2e/instant.spec.ts`: "product title is instant, reviews stream after navigation" (link com `prefetch`; dentro do `instant`: `<h1>` com "Produto 2", regiões "Relacionados" e "Populares" visíveis, "Carregando avaliações…" visível, zero `review`; depois do escopo: as avaliações aparecem).
 - `e2e/instant.spec.ts`: "popular block is out of the App Shell a default link loads" (link comum de "Relacionados"; dentro do `instant` só existe o App Shell: "Carregando populares…" visível, região "Populares" ausente). Ver `navigation-prefetch.md`.
+- `e2e/account.spec.ts`: "order history waits for navigation (navigation())" (link com `prefetch` de `/account` para `/account/orders`; dentro do `instant`: carrinho visível, "Loading orders…" visível, sem histórico). Ver `navigation-prefetch.md`.
 
 ## DevTools do `next dev` (conferido com `pnpm --filter catalog dev`)
 
