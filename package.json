@@ -1,0 +1,24 @@
+{
+  "name": "next16-microfrontends-lab",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "prod": "turbo run build && turbo run start --parallel",
+    "test": "turbo run test",
+    "e2e": "playwright test",
+    "typecheck": "turbo run typecheck",
+    "lint": "biome check .",
+    "db:reset": "pnpm --filter @lab/db reset",
+    "analyze": "pnpm --filter catalog exec next experimental-analyze"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.3",
+    "turbo": "2.11.10",
+    "typescript": "7.0.2"
+  }
+}

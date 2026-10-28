@@ -1,0 +1,16 @@
+{
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.next",
+      "!**/dist",
+      "!**/.turbo",
+      "!**/.superpowers",
+      "!**/.data",
+      "!docs"
+    ]
+  },
+  "formatter": { "indentStyle": "space", "indentWidth": 2 }
+}

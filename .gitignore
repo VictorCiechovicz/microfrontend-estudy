@@ -1,1 +1,9 @@
 .superpowers/
+node_modules
+.next
+dist
+.turbo
+.data
+test-results
+playwright-report
+.env
