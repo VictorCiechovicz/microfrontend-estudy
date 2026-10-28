@@ -9,7 +9,7 @@
     "./langs": "./src/langs.ts"
   },
   "scripts": {
-    "test": "vitest run",
+    "test": "vitest run --exclude '**/._*'",
     "reset": "node src/reset-cli.ts",
     "typecheck": "tsc --noEmit"
   },

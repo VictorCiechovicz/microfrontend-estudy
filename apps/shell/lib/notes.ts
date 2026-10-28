@@ -1,5 +1,5 @@
 const sources = import.meta.glob<{ default: string }>(
-  "../../../docs/features/*.md",
+  ["../../../docs/features/*.md", "!../../../docs/features/._*"],
   { eager: true, query: "?raw" },
 );
 
