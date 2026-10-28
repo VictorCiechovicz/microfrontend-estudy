@@ -9,6 +9,7 @@
       "!**/.turbo",
       "!**/.superpowers",
       "!**/.data",
+      "!**/pnpm-lock.yaml",
       "!docs"
     ]
   },
