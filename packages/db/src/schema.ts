@@ -1,7 +1,8 @@
 import type { DatabaseSync } from "node:sqlite";
 
-export type Lang = "pt" | "en";
-export const LANGS: readonly Lang[] = ["pt", "en"];
+import type { Lang } from "./langs.ts";
+
+export type { Lang };
 
 export type Product = {
   id: number;

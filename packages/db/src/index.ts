@@ -1,5 +1,6 @@
 export { closeDb, getDb } from "./client.ts";
 export { injectFault } from "./faults.ts";
+export { LANGS } from "./langs.ts";
 export { withLatency } from "./latency.ts";
 export { addToCart, getCart, removeFromCart } from "./repos/cart.ts";
 export {
@@ -25,5 +26,4 @@ export type {
   Product,
   User,
 } from "./schema.ts";
-export { LANGS } from "./schema.ts";
 export { resetDb } from "./seed.ts";

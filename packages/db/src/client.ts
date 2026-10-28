@@ -5,7 +5,17 @@ import { createSchema } from "./schema.ts";
 
 const DEFAULT_DB_PATH = ".data/lab.sqlite";
 
+const rootCache = new Map<string, string>();
+
 function findRoot(from: string): string {
+  const cached = rootCache.get(from);
+  if (cached) return cached;
+  const root = searchRoot(from);
+  rootCache.set(from, root);
+  return root;
+}
+
+function searchRoot(from: string): string {
   let dir = resolve(from);
   while (true) {
     if (existsSync(join(dir, "pnpm-workspace.yaml"))) return dir;
@@ -30,8 +40,8 @@ export function getDb(): DatabaseSync {
   closeDb();
   mkdirSync(dirname(path), { recursive: true });
   const db = new DatabaseSync(path);
-  db.exec("PRAGMA journal_mode = WAL");
   db.exec("PRAGMA busy_timeout = 5000");
+  db.exec("PRAGMA journal_mode = WAL");
   createSchema(db);
   current = { path, db };
   return db;
