@@ -68,7 +68,7 @@ export function RemoteWidget<N extends WidgetName>({
         );
       })
       .catch((error) => {
-        console.error(error);
+        console.warn(error);
         if (active) setState({ name, status: "failed" });
       });
     return () => {

@@ -80,3 +80,13 @@ test("a failed widget does not keep the fallback after the name changes", async 
   await act(async () => root.render(<RemoteWidget name="Recommendations" />));
   expect(container.textContent).toBe("recommendations widget");
 });
+
+test("an unavailable remote shows the fallback and logs a warning, not an error", async () => {
+  const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+  const error = vi.mocked(console.error);
+  loadRemote.mockRejectedValue(new Error("Failed to get manifest"));
+  await act(async () => root.render(<RemoteWidget name="CartWidget" />));
+  expect(container.textContent).toBe("Widget unavailable");
+  expect(warn).toHaveBeenCalledTimes(1);
+  expect(error).not.toHaveBeenCalled();
+});

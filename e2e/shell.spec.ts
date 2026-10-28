@@ -8,6 +8,14 @@ test("home declares png and svg icons in head", async ({ page }) => {
     links.map((link) => link.getAttribute("type")),
   );
   expect(types.sort()).toEqual(["image/png", "image/svg+xml"]);
+  const hrefs = await icons.evaluateAll((links) =>
+    links.map((link) => link.getAttribute("href") ?? ""),
+  );
+  for (const href of hrefs) {
+    const response = await page.request.get(href);
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toMatch(/^image\//);
+  }
 });
 
 test("home is served as a prerendered page", async ({ request }) => {

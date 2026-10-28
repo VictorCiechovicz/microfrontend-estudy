@@ -64,6 +64,10 @@ app/catalog/[lang]/lab/errors/HydrationMismatch.tsx (4:10) @ HydrationMismatch
 > 4 |   return <p>Rendered at {Date.now()}</p>;
 ```
 
+## Cobertura automatizada
+
+`e2e/error-lab.spec.ts` roda em produção e confere o título e o aviso em pt e en, a ausência dos botões e que `?mismatch=1` não renderiza o componente com `Date.now()`.
+
 ## Nota
 
 A verificação é manual de propósito: o overlay só existe em dev e não há como o Playwright de produção (`pnpm e2e`) vê-lo.

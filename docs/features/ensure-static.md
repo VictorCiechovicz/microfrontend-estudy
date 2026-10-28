@@ -10,7 +10,7 @@ Desde 16.4.0. Lab em 16.4.3.
 
 ## Onde no código
 
-- `apps/shell/app/page.tsx` exporta `ensureStatic = 'navigation'`: a home do shell (`/`) é totalmente estática. `e2e/shell.spec.ts` confere que `/` responde com `x-nextjs-prerender` (o Next 16.4.3 envia o header duas vezes, o Playwright o junta como `1, 1`) e que o `<head>` tem os dois `<link rel="icon">` (png 32x32 e svg, de `apps/shell/app/icon.png` e `icon.svg`).
+- `apps/shell/app/page.tsx` exporta `ensureStatic = 'navigation'`: a home do shell (`/`) é totalmente estática. `e2e/shell.spec.ts` confere que `/` responde com `x-nextjs-prerender` (o Next 16.4.3 envia o header duas vezes, o Playwright o junta como `1, 1`) e que o `<head>` tem os dois `<link rel="icon">` (png 32x32 e svg, de `apps/shell/app/icon.png` e `icon.svg`), e que cada href responde 200 com `content-type` de imagem. Esse e2e não prova o `ensureStatic`: a home já saía estática antes dele. A evidência é o registro manual do build quebrando, abaixo.
 - `apps/catalog/app/catalog/[lang]/layout.tsx` exporta `ensureStatic = 'prefetch'`: o App Shell e o prefetch por link das rotas do catálogo têm de ser estáticos. Os valores `'shell'` e `'prefetch'` não acrescentam validação de build; só `'navigation'` valida (ver `cache-components.md`).
 
 ## Verificação manual: o que o build diz quando a home deixa de ser estática

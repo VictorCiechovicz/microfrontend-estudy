@@ -130,6 +130,12 @@ O `next` do login da conta é relativo ao `basePath` (`/orders` volta para `/acc
 
 Multi-Zones divide o site por URL; Module Federation reaproveita o mesmo componente (ex.: o carrinho) em várias zonas sem rebuild delas.
 
+## Remote fora do ar em desenvolvimento
+
+`RemoteWidget` registra a falha de carregamento do remote com `console.warn` (a mensagem do erro é mantida). Um remote indisponível é uma condição esperada e tratada: com `console.error`, o overlay do `next dev` aparecia por cima da página mesmo com o fallback já visível. Os erros de renderização do widget, capturados pelo `WidgetErrorBoundary`, seguem sendo erros.
+
+Verificação manual: `pnpm --filter catalog dev` com a :3003 parada, abrindo `/catalog/pt/lab/errors`: sem overlay e com o `widget-fallback` visível.
+
 ## Desvios em relação ao plano
 
 - `shared` inclui `react-dom/client` no remote e no host (ver erro #527 acima).
