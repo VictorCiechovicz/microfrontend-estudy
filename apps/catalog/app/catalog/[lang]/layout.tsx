@@ -12,7 +12,7 @@ import "./view-transitions.css";
 export const ensureStatic = "prefetch";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
+  metadataBase: new URL(process.env.SHELL_URL ?? "http://localhost:3000"),
 };
 
 export function generateStaticParams() {

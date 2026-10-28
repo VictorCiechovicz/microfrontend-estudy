@@ -26,7 +26,7 @@ O plano previa que o catálogo precisaria de um rewrite próprio `/catalog-stati
 - **`rewrites()`** em `apps/shell/next.config.ts` cobre o roteamento fixo: `/catalog`, `/catalog/:path+` e `/catalog-static/:path+` vão para `CATALOG_URL`; `/account` e `/account/:path+` vão para `ACCOUNT_URL`, mantendo o caminho. É a opção recomendada, com menos latência. As regras são calculadas no `next build` e gravadas em `.next/routes-manifest.json`, então mudar `CATALOG_URL` ou `ACCOUNT_URL` exige rebuild do shell.
 - **`proxy.ts`** (o antigo `middleware.ts`, renomeado no Next 16) serve para decisões por requisição. Aqui ele lê o cookie de feature flag `lab_flag_sale`: `/catalog/sale` vira `/catalog/pt/sale-b` quando o cookie vale `b`, e `/catalog/pt/sale-a` nos demais casos, via `NextResponse.rewrite` para a URL do catálogo. O `matcher: ['/catalog/sale']` limita o proxy a esse caminho. O proxy roda antes dos `rewrites`, então ganha da regra `/catalog/:path+`, e lê `CATALOG_URL` em tempo de execução.
 
-`CATALOG_URL` e `ACCOUNT_URL` têm default no código (`apps/shell/lib/zone-urls.ts`: `http://localhost:3001` e `http://localhost:3002`), então nada depende de `.env`.
+`CATALOG_URL`, `ACCOUNT_URL` e `SHELL_URL` têm default no código (`apps/shell/lib/zone-urls.ts`: `http://localhost:3001`, `http://localhost:3002` e `http://localhost:3000`), então nada depende de `.env`.
 
 Para testar a flag, crie o cookie no DevTools (`document.cookie = 'lab_flag_sale=b'`) e recarregue `/catalog/sale`: o título muda de "Sale A" para "Sale B", e a URL na barra continua `/catalog/sale`.
 
@@ -46,4 +46,4 @@ O spec `e2e/zones.spec.ts` automatiza esses passos.
 
 ## Configuração comum às zonas
 
-As três ligam `cacheComponents: true` e `partialPrefetching: true` (ambas chaves de topo no 16.4.3; `partialPrefetching` exige `cacheComponents`) e `experimental.serverActions.allowedOrigins: ['localhost:3000']`, porque o navegador sempre fala com o shell e o `Origin` das Server Actions é `localhost:3000`, não a porta da zona.
+As três ligam `cacheComponents: true` e `partialPrefetching: true` (ambas chaves de topo no 16.4.3; `partialPrefetching` exige `cacheComponents`) e `experimental.serverActions.allowedOrigins` com o host de `SHELL_URL` (padrão `localhost:3000`), porque o navegador sempre fala com o shell e o `Origin` das Server Actions é o do shell, não a porta da zona.

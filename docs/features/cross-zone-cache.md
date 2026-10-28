@@ -24,9 +24,11 @@ As tags vivem em `@lab/cache-sync` (`packages/cache-sync/src/tags.ts`) e são a 
 
 Endpoints internos (`POST`, header `x-lab-secret`, body `{ "tags": string[] }`):
 
-- shell: `http://localhost:3000/internal/revalidate`
-- catalog: `http://localhost:3001/internal/revalidate`
-- account: `http://localhost:3002/account/internal/revalidate` (por causa do `basePath`)
+- shell: `${SHELL_URL}/internal/revalidate` (padrão `http://localhost:3000`)
+- catalog: `${CATALOG_URL}/internal/revalidate` (padrão `http://localhost:3001`)
+- account: `${ACCOUNT_URL}/account/internal/revalidate` (padrão `http://localhost:3002`; `/account` por causa do `basePath`)
+
+As URLs são lidas do ambiente em `packages/cache-sync/src/zones.ts`, as mesmas que o shell usa nos rewrites.
 
 Respostas: 401 com segredo errado, 400 com body inválido, 405 para outro método, 200 com `{ "revalidated": [...] }`. O segredo vem de `LAB_INTERNAL_SECRET`, com padrão `lab-dev-secret`.
 

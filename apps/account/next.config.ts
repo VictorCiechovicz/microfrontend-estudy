@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const SHELL_URL = process.env.SHELL_URL ?? "http://localhost:3000";
+
 const nextConfig: NextConfig = {
   basePath: "/account",
   transpilePackages: ["@lab/ui", "@lab/db", "@lab/cache-sync", "@lab/mf-host"],
@@ -7,7 +9,7 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      allowedOrigins: [new URL(SHELL_URL).host],
     },
     useOffline: true,
     turbopackGc: true,

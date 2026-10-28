@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import { ACCOUNT_URL, CATALOG_URL } from "./lib/zone-urls";
+import { ACCOUNT_URL, CATALOG_URL, SHELL_URL } from "./lib/zone-urls";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@lab/ui", "@lab/db", "@lab/cache-sync", "@lab/mf-host"],
@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   experimental: {
     agentUpgrade: "security",
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      allowedOrigins: [new URL(SHELL_URL).host],
     },
   },
   async rewrites() {
