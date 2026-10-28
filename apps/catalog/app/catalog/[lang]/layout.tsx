@@ -1,5 +1,6 @@
 import { SiteFooter, SiteHeader } from "@lab/ui";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
+import { UserSlot } from "../../components/UserSlot";
 
 export function generateStaticParams() {
   return [{ lang: "pt" }, { lang: "en" }];
@@ -16,7 +17,14 @@ export default async function CatalogLayout({
   return (
     <html lang={lang} data-zone="catalog">
       <body>
-        <SiteHeader zone="catalog" />
+        <SiteHeader
+          zone="catalog"
+          userSlot={
+            <Suspense fallback={null}>
+              <UserSlot />
+            </Suspense>
+          }
+        />
         {children}
         <SiteFooter />
       </body>

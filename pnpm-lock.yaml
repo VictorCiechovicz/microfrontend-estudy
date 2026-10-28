@@ -226,6 +226,9 @@ importers:
       '@lab/cache-sync':
         specifier: workspace:*
         version: link:../../packages/cache-sync
+      '@lab/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@lab/ui':
         specifier: workspace:*
         version: link:../../packages/ui

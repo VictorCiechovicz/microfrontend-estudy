@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@lab/cache-sync": "workspace:*",
+    "@lab/db": "workspace:*",
     "@lab/ui": "workspace:*",
     "next": "16.4.3",
     "react": "19.3.1",
