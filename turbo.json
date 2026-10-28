@@ -5,6 +5,7 @@
     "start": { "persistent": true, "cache": false },
     "build": {
       "dependsOn": ["^build"],
+      "env": ["EXPOSE_TESTING_API"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "test": {},

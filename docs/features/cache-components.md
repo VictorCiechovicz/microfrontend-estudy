@@ -23,7 +23,7 @@ Com `cacheComponents: true`, nada é cacheado por padrão: o que deve entrar no 
 Dois buracos por requisição, de propósito:
 
 - `StockBlock` chama `connection()` antes de `getProductStock`. O componente renderiza a cada requisição (atrás de `<Suspense>`), mas o dado continua no `'use cache'` de 1 minuto, então a maioria das requisições acerta o cache. Sem o `connection()`, o estoque entrava no HTML estático promovido pelo ISR e a falha injetada era consumida pela renderização em segundo plano, não pela do usuário (ver `catch-error.md`).
-- As avaliações (`Reviews` em `products/[id]/page.tsx`) chamam `connection()` e leem o banco sem cache, atrás de `<Suspense fallback="Carregando avaliações…">`.
+- As avaliações (`products/[id]/Reviews.tsx`) chamam `await navigation()` e leem o banco sem cache, atrás de `<Suspense fallback="Carregando avaliações…">`. Ficam fora do App Shell e do prefetch por link e renderizam na navegação (ver `navigation-prefetch.md`).
 
 `apps/catalog/app/catalog/[lang]/layout.tsx` exporta `ensureStatic = 'prefetch'`: o App Shell e o prefetch por link de toda rota do catálogo têm de ser estáticos. O que lê cookie (`UserSlot`) já fazia `await navigation()` dentro de `<Suspense>`, então fica fora do shell e do prefetch.
 

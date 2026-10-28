@@ -1,6 +1,7 @@
 import { tags } from "@lab/cache-sync";
 import {
   getProduct,
+  getRecommendations,
   getStock,
   listProducts,
   type Product,
@@ -31,4 +32,11 @@ export async function getProductStock(id: number): Promise<number> {
   cacheTag(tags.stock(id));
   cacheLife("minutes");
   return withLatency(() => getStock(id));
+}
+
+export async function getRelatedProducts(id: number): Promise<Product[]> {
+  "use cache";
+  cacheTag(tags.products());
+  cacheLife("hours");
+  return withLatency(() => getRecommendations(id));
 }

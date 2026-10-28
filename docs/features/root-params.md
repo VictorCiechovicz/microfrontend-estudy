@@ -15,7 +15,7 @@ Introduzido no Next 16.3.0; o lab usa 16.4.3. Os tipos (`lang(): Promise<string>
 - `apps/catalog/lib/i18n.ts`: `currentLang()` lê `lang()` e chama `notFound()` se o valor não estiver em `LANGS`; `t(key, vars?)` usa o idioma corrente para escolher o texto.
 - `apps/catalog/app/catalog/[lang]/layout.tsx`: `<html lang={await currentLang()}>`. É aqui que `/catalog/xx` vira 404.
 - `apps/catalog/lib/data.ts`: `getProductList()` e `getProductDetail(id)` leem `lang()` dentro do `'use cache'`, então o cache se divide por idioma sem o idioma aparecer nos argumentos.
-- Componentes profundos (`StockBlock`, a seção de avaliações em `products/[id]/page.tsx`) chamam `t()` sem receber o idioma.
+- Componentes profundos (`StockBlock`, `products/[id]/Reviews.tsx`) chamam `t()` sem receber o idioma.
 
 ## Restrições observadas
 
