@@ -1,5 +1,6 @@
 export const tags = {
   products: () => "products",
+  productRankings: () => "products:rankings",
   product: (id: number) => `product:${id}`,
   stock: (id: number) => `stock:${id}`,
   userProfile: (userId: number) => `user:${userId}:profile`,

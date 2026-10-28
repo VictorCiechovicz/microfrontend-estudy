@@ -43,16 +43,28 @@ async function cartPriceOf(page: Page, productId: number) {
 
 async function submitPrice(page: Page, productId: string, priceCents: string) {
   await page.goto("/catalog/pt/admin");
-  await page.getByLabel("Product id").fill(productId);
-  await page.getByLabel("Price (cents)").fill(priceCents);
-  await page.getByRole("button", { name: "Update price" }).click();
+  await page.getByLabel("Id do produto").fill(productId);
+  await page.getByLabel("Preço (centavos)").fill(priceCents);
+  await page.getByRole("button", { name: "Atualizar preço" }).click();
 }
 
 async function setPrice(page: Page, productId: number, priceCents: number) {
   await submitPrice(page, String(productId), String(priceCents));
   await expect(page.getByRole("main").getByRole("status")).toHaveText(
-    `Product ${productId} now costs ${priceCents} cents`,
+    `Produto ${productId} agora custa ${priceCents} centavos`,
   );
+}
+
+function listPriceOf(page: Page, productId: number) {
+  return page
+    .getByRole("main")
+    .getByRole("listitem")
+    .filter({
+      has: page.getByRole("link", {
+        name: `Produto ${productId}`,
+        exact: true,
+      }),
+    });
 }
 
 function unreadBadge(page: Page) {
@@ -114,6 +126,19 @@ test("price change in catalog updates cart total in account", async ({
   await expect(page.getByTestId("cart-total")).toContainText("46,90");
 });
 
+test("price change in catalog shows on the catalog list at once (updateTag)", async ({
+  page,
+}) => {
+  await loginAsBruno(page);
+  await page.goto("/catalog/pt");
+  await expect(listPriceOf(page, PRICE_PRODUCT_ID)).toContainText("R$");
+
+  await setPrice(page, PRICE_PRODUCT_ID, 2468);
+
+  await page.goto("/catalog/pt");
+  await expect(listPriceOf(page, PRICE_PRODUCT_ID)).toContainText("24,68");
+});
+
 test("reading a notification updates the catalog header badge", async ({
   page,
 }) => {
@@ -146,10 +171,7 @@ test("catalog price change serves stale once then fresh (SWR)", async ({
   await setPrice(page, SWR_PRODUCT_ID, 1999);
 
   await page.goto(`/catalog/pt/products/${SWR_PRODUCT_ID}`);
-  test.info().annotations.push({
-    type: "first visit after setPrice",
-    description: (await price.textContent()) ?? "",
-  });
+  await expect(price).toContainText("16,00");
   await expect
     .poll(
       async () => {
@@ -163,12 +185,26 @@ test("catalog price change serves stale once then fresh (SWR)", async ({
 
 test.describe("price admin", () => {
   test("hides the form from logged-out users", async ({ page }) => {
-    await page.goto("/catalog/pt/admin");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Price admin",
+    for (const [lang, heading, login] of [
+      ["pt", "Admin de preços", "Entrar"],
+      ["en", "Price admin", "Log in"],
+    ]) {
+      await page.goto(`/catalog/${lang}/admin`);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
+      await expect(page.getByRole("main").getByRole("link")).toHaveText(login);
+      await expect(page.getByRole("main").getByRole("textbox")).toHaveCount(0);
+    }
+  });
+
+  test("labels the form in the catalog language", async ({ page }) => {
+    await loginAsBruno(page);
+    await page.goto("/catalog/en/admin");
+    await page.getByLabel("Product id").fill("9999");
+    await page.getByLabel("Price (cents)").fill("100");
+    await page.getByRole("button", { name: "Update price" }).click();
+    await expect(page.getByRole("main").getByRole("alert")).toHaveText(
+      "Unknown product",
     );
-    await expect(page.getByRole("main").getByRole("link")).toHaveText("Log in");
-    await expect(page.getByLabel("Product id")).toHaveCount(0);
   });
 
   test("redirects to login when the session is gone", async ({
@@ -181,11 +217,11 @@ test.describe("price admin", () => {
     const before = await cartPriceOf(page, PRICE_PRODUCT_ID);
 
     await page.goto("/catalog/pt/admin");
-    await expect(page.getByLabel("Product id")).toBeVisible();
+    await expect(page.getByLabel("Id do produto")).toBeVisible();
     await context.clearCookies();
-    await page.getByLabel("Product id").fill(String(PRICE_PRODUCT_ID));
-    await page.getByLabel("Price (cents)").fill("4321");
-    await page.getByRole("button", { name: "Update price" }).click();
+    await page.getByLabel("Id do produto").fill(String(PRICE_PRODUCT_ID));
+    await page.getByLabel("Preço (centavos)").fill("4321");
+    await page.getByRole("button", { name: "Atualizar preço" }).click();
     await expect(page).toHaveURL(
       /\/account\/login\?next=%2Fcatalog%2Fpt%2Fadmin$/,
     );
@@ -201,23 +237,25 @@ test.describe("price admin", () => {
     await putInCart(page, PRICE_PRODUCT_ID, 1);
     const before = await cartPriceOf(page, PRICE_PRODUCT_ID);
 
-    for (const [productId, priceCents] of [
-      ["9999", "100"],
-      ["0", "100"],
-      ["abc", "100"],
-      ["7.5", "100"],
-      ["7", "0"],
-      ["7", "-5"],
-      ["7", "1.5"],
-      ["7", "abc"],
-      ["7", "100000001"],
-      ["7", "99999999999999999999"],
+    const unknownProduct = "Produto desconhecido";
+    const invalidPrice = "Preço inválido";
+    for (const [productId, priceCents, message] of [
+      ["9999", "100", unknownProduct],
+      ["0", "100", unknownProduct],
+      ["abc", "100", unknownProduct],
+      ["7.5", "100", unknownProduct],
+      ["7", "0", invalidPrice],
+      ["7", "-5", invalidPrice],
+      ["7", "1.5", invalidPrice],
+      ["7", "abc", invalidPrice],
+      ["7", "100000001", invalidPrice],
+      ["7", "99999999999999999999", invalidPrice],
     ]) {
       await submitPrice(page, productId, priceCents);
       await expect(
         page.getByRole("main").getByRole("alert"),
         `${productId} / ${priceCents}`,
-      ).toHaveText(/^(Unknown product|Invalid price)$/);
+      ).toHaveText(message);
     }
     expect(await cartPriceOf(page, PRICE_PRODUCT_ID)).toBe(before);
     await clearCart(page);

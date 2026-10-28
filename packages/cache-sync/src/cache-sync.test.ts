@@ -31,6 +31,7 @@ const request = (init: RequestInit & { secret?: string | null } = {}) => {
 test("tags build the documented vocabulary", () => {
   expect(tags.stock(1)).toBe("stock:1");
   expect(tags.userCart(7)).toBe("user:7:cart");
+  expect(tags.productRankings()).toBe("products:rankings");
 });
 
 test("broadcast skips the origin zone", async () => {

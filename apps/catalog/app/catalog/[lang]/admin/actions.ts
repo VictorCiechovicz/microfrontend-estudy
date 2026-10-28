@@ -3,7 +3,7 @@
 import { broadcastInvalidation, tags } from "@lab/cache-sync";
 import { getProduct, setPrice } from "@lab/db";
 import { isLang } from "@lab/db/langs";
-import { revalidateTag } from "next/cache";
+import { revalidateTag, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSessionUserId } from "../../../../lib/session";
 
@@ -11,7 +11,7 @@ const MAX_PRICE_CENTS = 10_000_000;
 
 export type SetPriceResult =
   | { ok: true; productId: number; priceCents: number }
-  | { ok: false; error: "Unknown product" | "Invalid price" };
+  | { ok: false; error: "unknownProduct" | "invalidPrice" };
 
 function parsePositiveInt(
   value: FormDataEntryValue | null,
@@ -35,19 +35,21 @@ export async function setPriceAction(
     Number.MAX_SAFE_INTEGER,
   );
   if (productId === null || !getProduct(productId, "en")) {
-    return { ok: false, error: "Unknown product" };
+    return { ok: false, error: "unknownProduct" };
   }
   const priceCents = parsePositiveInt(
     formData.get("priceCents"),
     MAX_PRICE_CENTS,
   );
-  if (priceCents === null) return { ok: false, error: "Invalid price" };
+  if (priceCents === null) return { ok: false, error: "invalidPrice" };
 
   setPrice(productId, priceCents);
   revalidateTag(tags.product(productId), "max");
-  revalidateTag(tags.products(), "max");
-  await broadcastInvalidation([tags.product(productId), tags.products()], {
-    from: "catalog",
-  });
+  revalidateTag(tags.productRankings(), "max");
+  updateTag(tags.products());
+  await broadcastInvalidation(
+    [tags.product(productId), tags.productRankings(), tags.products()],
+    { from: "catalog" },
+  );
   return { ok: true, productId, priceCents };
 }

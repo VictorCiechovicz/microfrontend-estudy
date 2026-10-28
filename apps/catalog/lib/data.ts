@@ -37,7 +37,7 @@ export async function getProductStock(id: number): Promise<number> {
 
 export async function getRelatedProducts(id: number): Promise<Product[]> {
   "use cache";
-  cacheTag(tags.products());
+  cacheTag(tags.productRankings());
   cacheLife("hours");
   return withLatency(() => getRecommendations(id));
 }
@@ -54,7 +54,7 @@ export async function getRecommendedProducts(
 
 export async function getPopularProducts(): Promise<Product[]> {
   "use cache";
-  cacheTag(tags.products());
+  cacheTag(tags.productRankings());
   cacheLife("hours");
   return withLatency(() => getRecommendations(undefined, 3));
 }

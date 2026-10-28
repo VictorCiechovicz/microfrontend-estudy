@@ -10,7 +10,8 @@ As tags vivem em `@lab/cache-sync` (`packages/cache-sync/src/tags.ts`) e são a 
 
 | Tag | Uso |
 | --- | --- |
-| `products` | lista de produtos |
+| `products` | lista de produtos (`/catalog/<lang>`) e recomendações do widget |
+| `products:rankings` | blocos "Relacionados" e "Populares" da página de produto (listas ordenadas por preço) |
 | `product:<id>` | um produto |
 | `stock:<id>` | estoque de um produto |
 | `user:<id>:profile` / `orders` / `cart` / `notifications` | dados do usuário |
@@ -18,6 +19,7 @@ As tags vivem em `@lab/cache-sync` (`packages/cache-sync/src/tags.ts`) e são a 
 ## Invalidação
 
 - Na zona que originou a mudança: `updateTag(tag)` (leitura imediata do próprio dado na mesma requisição).
+  - Exceção deliberada: em `setPriceAction` (catálogo), `product:<id>` e `products:rankings` usam `revalidateTag(tag, 'max')`. É a demonstração de stale-while-revalidate: quem visita o detalhe do produto logo depois recebe o preço antigo enquanto a página se regenera em segundo plano. Quem mudou o preço vê o resultado na lista (`products`, com `updateTag`), e o detalhe velho por alguns instantes é aceitável num catálogo. Ver [Stale-while-revalidate no catálogo](#stale-while-revalidate-no-catálogo).
 - Nas outras zonas: `broadcastInvalidation(tags, { from })` faz um `POST` para o endpoint interno de cada zona, exceto a de origem. O endpoint chama `revalidateTag(tag, { expire: 0 })`, que expira a entrada imediatamente.
 
 Endpoints internos (`POST`, header `x-lab-secret`, body `{ "tags": string[] }`):
@@ -30,7 +32,7 @@ Respostas: 401 com segredo errado, 400 com body inválido, 405 para outro métod
 
 ## Zona fora do ar
 
-`broadcastInvalidation` nunca lança. Usa `Promise.allSettled` com `AbortSignal.timeout(2000)`, devolve `{ zone, ok, error? }` por zona e registra um `console.warn` para cada falha. A ação do usuário conclui normalmente; o aviso para a zona caída é perdido (não há fila nem retry) e o dado dela só se atualiza quando o `cacheLife` expirar.
+`broadcastInvalidation` nunca lança. Usa `Promise.allSettled` com `AbortSignal.timeout(2000)`, devolve `{ zone, ok, error? }` por zona e registra um `console.warn` para cada falha. A ação do usuário conclui normalmente e não há fila nem retry. O efeito depende de como a zona falhou (medido em [Resultado com uma zona parada](#resultado-com-uma-zona-parada-execução-manual)): uma zona que caiu e reinicia volta com o cache em memória vazio e lê dado fresco; uma zona que continua de pé mas recusou o aviso (segredo errado, falha de rede) segue servindo o dado velho até o `cacheLife` expirar.
 
 ## Os três casos (e2e `e2e/coherence.spec.ts`)
 
@@ -44,9 +46,10 @@ Respostas: 401 com segredo errado, 400 com body inválido, 405 para outro métod
         │
         └─ broadcast user:<id>:notifications ─────────────────────────────► revalidateTag(expire 0)
                                                                               badge do header
- revalidateTag(expire 0) ◄── broadcast product:<id>, products ─────────── setPriceAction
- carrinho em /account/orders                                               revalidateTag(product:<id>, 'max')
-                                                                           revalidateTag(products, 'max')
+ revalidateTag(expire 0) ◄── broadcast product:<id>,                      setPriceAction
+ carrinho em /account/orders   products:rankings, products ────────────── revalidateTag(product:<id>, 'max')
+                                                                           revalidateTag(products:rankings, 'max')
+                                                                           updateTag(products)
 ```
 
 O shell também recebe cada broadcast (é zona-alvo de toda origem), mas hoje não guarda nenhum dado com essas tags.
@@ -54,14 +57,15 @@ O shell também recebe cada broadcast (é zona-alvo de toda origem), mas hoje n�
 | Caso | Quem muda | Tag | Quem lê em cache |
 | --- | --- | --- | --- |
 | Compra na conta → estoque no catálogo | `placeOrderAction` (account) | `stock:<id>` | `getProductStock` no `StockBlock` (`cacheLife('minutes')`) |
-| Preço no catálogo → total do carrinho na conta | `setPriceAction` (catalog, `/catalog/<lang>/admin`) | `product:<id>`, `products` | `getCartLines` (account) |
+| Preço no catálogo → total do carrinho na conta | `setPriceAction` (catalog, `/catalog/<lang>/admin`) | `product:<id>`, `products:rankings`, `products` | `getCartLines` (account) |
 | Notificação lida na conta → badge no header do catálogo | `markReadAction` (account) | `user:<id>:notifications` | `getUnreadCount` no `NotificationBadge` do catálogo (`cacheLife('hours')`) |
 
 Detalhes:
 
 - **Carrinho marcado por produto.** `getCartLines` chama `cacheTag(user:<id>:cart)` e, depois de ler as linhas, `cacheTag(product:<id>)` para cada produto do carrinho. O preço da linha vem do `JOIN` com `products` na leitura, então basta expirar a entrada para o total refletir o preço novo. As linhas de **pedido** não recebem `product:<id>`: elas guardam o preço do momento da compra (`order_lines.price_cents`) e não devem mudar quando o preço muda.
 - **Badge no catálogo.** O cookie `lab_user` é lido fora da função cacheada; o id do usuário entra como argumento de `getUnreadCount(userId)`, que faz `cacheTag(user:<id>:notifications)`. O link do badge é um `<a>` para `/account/notifications` (outra zona).
-- **Admin de preço.** `setPriceAction(formData)` exige sessão (sem cookie válido: `redirect` para `/account/login?next=/catalog/<lang>/admin`; a página nem mostra o formulário). `productId` precisa ser inteiro positivo de um produto existente e `priceCents` inteiro entre 1 e 10.000.000; fora disso a ação devolve `Unknown product` / `Invalid price`, nunca 500. O `lang` do `next` vem de um campo oculto do formulário, porque `next/root-params` não funciona em Server Actions no 16.4.3.
+- **Dados que o spec não restaura.** O `afterAll` volta os preços dos produtos 6 e 7 e esvazia o carrinho do Bruno. Não volta o estoque do produto 6 (cai 2 por execução; não existe `setStock`), as notificações lidas nem os pedidos criados do Bruno. O `pnpm e2e` sempre começa com `db:reset`, e o teste de estoque compara com o valor lido no início.
+- **Admin de preço.** `setPriceAction(formData)` exige sessão (sem cookie válido: `redirect` para `/account/login?next=/catalog/<lang>/admin`; a página nem mostra o formulário). `productId` precisa ser inteiro positivo de um produto existente e `priceCents` inteiro entre 1 e 10.000.000; fora disso a ação devolve o código `unknownProduct` / `invalidPrice` (o formulário mostra o texto pelo `t()` do catálogo: "Produto desconhecido" / "Preço inválido" em pt), nunca 500. O `lang` do `next` vem de um campo oculto do formulário, porque `next/root-params` não funciona em Server Actions no 16.4.3.
 
 Mutation check (cada teste falha sem o seu mecanismo; build e2e com a mudança, `pnpm e2e e2e/coherence.spec.ts`):
 
@@ -72,21 +76,26 @@ Mutation check (cada teste falha sem o seu mecanismo; build e2e com a mudança, 
 | `cacheTag(product:<id>)` em `getCartLines` | total do carrinho | `Total R$ 34,00` |
 | broadcast de `markReadAction` | badge | `2` em vez de `0` |
 | `revalidateTag(product:<id>, 'max')` local | SWR | `R$ 16,00` por 15 s |
+| `revalidateTag(product:<id>, 'max')` trocado por `updateTag(product:<id>)` | SWR | primeira visita já com `R$ 19,99` em vez de `R$ 16,00` |
+| `updateTag(products)` trocado por `revalidateTag(products, 'max')` | lista | `Produto 7 R$ 23,45` em vez de `R$ 24,68` |
 
 ## Stale-while-revalidate no catálogo
 
-Na zona de origem, `setPriceAction` usa `revalidateTag(tag, 'max')` para `product:<id>` **e** para `products` (a lista só tem a tag `products`; sem isso a lista ficaria com o preço antigo até o `cacheLife`). Com `'max'` a entrada só é marcada como velha: a próxima requisição recebe o conteúdo antigo e dispara a regeneração em segundo plano. Escolhemos `'max'` também para `products` para que a lista e o detalhe tenham a mesma semântica no catálogo. Nas outras zonas o broadcast continua com `{ expire: 0 }` (o endpoint interno não sabe se o leitor tolera conteúdo velho, e o caso do carrinho não tolera).
+Em `setPriceAction`, cada tag recebe a semântica de quem a lê:
 
-Medição (build de produção, `pnpm --filter <zona> start`, detalhe `/catalog/pt/products/6` e lista `/catalog/pt` lidos alternadamente logo depois de mudar o preço de R$ 16,00 para R$ 19,99):
+- `products` → `updateTag`: a lista do catálogo (leitura de quem acabou de salvar) mostra o preço novo já na primeira visita.
+- `product:<id>` e `products:rankings` → `revalidateTag(tag, 'max')`: a entrada só é marcada como velha; a próxima requisição recebe o conteúdo antigo e dispara a regeneração em segundo plano.
+- Nas outras zonas o broadcast usa `{ expire: 0 }` para as três (o endpoint interno não sabe se o leitor tolera conteúdo velho, e o carrinho não tolera).
 
-```
-warm detail R$ 16,00 list R$ 16,00
-detail #1 R$ 16,00 list R$ 16,00
-detail #2 R$ 16,00 list R$ 19,99
-detail #3 R$ 19,99 list R$ 19,99
-```
+### Por que existe `products:rankings`
 
-Ou seja, "velho uma vez" é uma simplificação: o conteúdo velho é servido enquanto a regeneração disparada pela primeira requisição não termina, então duas requisições seguidas podem ver o preço antigo. O teste e2e registra o que a primeira visita mostrou (anotação `first visit after setPrice`) e só afirma o valor final, com `expect.poll` (até 15 s). Em três execuções seguidas do spec (banco e cache de rota zerados a cada uma), a primeira visita mostrou `R$ 16,00`, o preço antigo, nas três.
+Antes, "Relacionados" e "Populares" usavam a tag `products`. Os dois ficam no shell pré-renderizado da página de produto, então a entrada do cache de rota do detalhe também carregava `products`. Com `updateTag(products)`, essa entrada expirava na hora e a próxima visita re-renderizava o detalhe de forma bloqueante, e essa renderização lê `getProductDetail` fresco, mesmo com `product:<id>` só marcado como velho com `'max'`. O e2e de SWR falhava com `Expected "16,00" Received "R$ 19,99"`.
+
+A lição: **uma tag grossa num shell pré-renderizado anula o SWR de uma tag fina**. A página herda as tags de todo `'use cache'` do shell, e a invalidação mais forte entre elas decide como a página se regenera. Separar as listas da página de produto numa tag própria (`products:rankings`, também com `'max'`) mantém o detalhe em stale-while-revalidate enquanto a lista do catálogo segue com read-your-writes. As recomendações do widget (`getRecommendedProducts`) continuam com `products`: elas saem de uma rota de API, não do shell do detalhe.
+
+### O que o e2e verifica
+
+O spec afirma as duas coisas: a lista mostra o preço novo na primeira visita, e o detalhe mostra o preço antigo (`R$ 16,00`) na primeira visita e o novo (`R$ 19,99`) depois, via `expect.poll` (até 15 s). "Velho uma vez" é uma simplificação. Numa medição manual feita antes desta divisão de tags, o detalhe lido logo depois da mudança deu `16,00`, `16,00` e `19,99`: o conteúdo velho é servido enquanto a regeneração disparada pela primeira requisição não termina. Por isso o teste só exige o valor antigo na primeira visita e o novo em algum momento depois.
 
 ## Resultado com uma zona parada (execução manual)
 

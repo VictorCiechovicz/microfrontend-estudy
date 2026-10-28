@@ -5,7 +5,22 @@ import { Button } from "@lab/ui";
 import { useState } from "react";
 import { type SetPriceResult, setPriceAction } from "./actions";
 
-export function PriceForm({ lang }: { lang: Lang }) {
+export type PriceFormLabels = {
+  productId: string;
+  priceCents: string;
+  updatePrice: string;
+  priceUpdated: string;
+  unknownProduct: string;
+  invalidPrice: string;
+};
+
+export function PriceForm({
+  lang,
+  labels,
+}: {
+  lang: Lang;
+  labels: PriceFormLabels;
+}) {
   const [result, setResult] = useState<SetPriceResult | null>(null);
 
   async function submit(formData: FormData) {
@@ -17,21 +32,25 @@ export function PriceForm({ lang }: { lang: Lang }) {
       <input type="hidden" name="lang" value={lang} />
       <p>
         <label>
-          Product id <input name="productId" inputMode="numeric" required />
+          {labels.productId}{" "}
+          <input name="productId" inputMode="numeric" required />
         </label>
       </p>
       <p>
         <label>
-          Price (cents) <input name="priceCents" inputMode="numeric" required />
+          {labels.priceCents}{" "}
+          <input name="priceCents" inputMode="numeric" required />
         </label>
       </p>
-      <Button type="submit">Update price</Button>
+      <Button type="submit">{labels.updatePrice}</Button>
       {result?.ok ? (
         <p role="status">
-          Product {result.productId} now costs {result.priceCents} cents
+          {labels.priceUpdated
+            .replace("{id}", String(result.productId))
+            .replace("{cents}", String(result.priceCents))}
         </p>
       ) : null}
-      {result && !result.ok ? <p role="alert">{result.error}</p> : null}
+      {result && !result.ok ? <p role="alert">{labels[result.error]}</p> : null}
     </form>
   );
 }
