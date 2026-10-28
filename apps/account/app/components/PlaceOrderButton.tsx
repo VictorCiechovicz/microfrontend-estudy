@@ -19,6 +19,9 @@ export function PlaceOrderButton() {
           return;
         }
         setMessage(`Order #${result.orderId} placed`);
+        void import("canvas-confetti").then(({ default: confetti }) => {
+          confetti({ particleCount: 80, spread: 70, origin: { y: 0.7 } });
+        });
         window.dispatchEvent(
           new CustomEvent("lab:cart-changed", { detail: { count: 0 } }),
         );

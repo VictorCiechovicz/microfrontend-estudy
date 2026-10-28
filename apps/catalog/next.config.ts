@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@lab/ui", "@lab/db", "@lab/cache-sync", "@lab/mf-host"],
   cacheComponents: true,
   partialPrefetching: true,
+  reactCompiler: true,
   turbopack: {
     rules: {
       "*.md": { condition: { query: "?raw" }, type: "text" },
@@ -14,6 +15,7 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: ["localhost:3000"],
     },
+    turbopackRustReactCompiler: true,
     exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === "1",
   },
 };

@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
       allowedOrigins: ["localhost:3000"],
     },
     useOffline: true,
+    turbopackGc: true,
+    turbopackLazyDynamicImports: true,
+    turbopackPluginRuntimeStrategy: "workerThreads",
     exposeTestingApiInProductionBuild: process.env.EXPOSE_TESTING_API === "1",
   },
 };

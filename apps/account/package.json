@@ -6,6 +6,8 @@
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start -p 3002",
+    "dev:inspect": "next dev -p 3002 --inspect",
+    "start:inspect": "next start -p 3002 --inspect",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -13,12 +15,14 @@
     "@lab/db": "workspace:*",
     "@lab/mf-host": "workspace:*",
     "@lab/ui": "workspace:*",
+    "canvas-confetti": "1.9.4",
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@lab/tsconfig": "workspace:*",
+    "@types/canvas-confetti": "1.9.0",
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
