@@ -27,6 +27,6 @@ O usuário entra por `http://localhost:3000`, e o shell repassa `/account/*` por
 
 1. `pnpm prod`, entre como Ana, ponha algo no carrinho (botão do catálogo, ou `POST /account/api/cart`) e faça um pedido em `/account/orders`.
 2. Clique em "Pedido #N": abre o modal, o `<h1>` "Pedidos" continua atrás e a URL muda para `/account/orders/N`.
-3. O fundo escuro do modal cobre a página, então pela tela só se sai dele por "Close" ou pelo voltar. O teste dispara o clique direto no `<Link>` do badge do header (`dispatchEvent("click")`) para exercitar uma navegação suave com o modal aberto: a URL vira `/account/notifications` e o modal fecha por causa do `[...catchAll]`; voltar no navegador reabre o modal.
-4. Recarregue: some o modal, e a página mostra `<h1>Order #N</h1>`. "Close" (ou o voltar do navegador) fecha o modal.
+3. O fundo escuro do modal cobre a página, mas não o header, que continua clicável. O sino do header é um `<Link>` para `/notifications`; o teste dispara o clique nele (`dispatchEvent("click")`) para exercitar uma navegação suave com o modal aberto: a URL vira `/account/notifications` e o modal fecha por causa do `[...catchAll]`; voltar no navegador reabre o modal.
+4. Recarregue: some o modal, e a página mostra `<h1>Pedido #N</h1>`. "Fechar" (ou o voltar do navegador) fecha o modal.
 5. `e2e/account.spec.ts` › "order detail opens as modal from list and as page on reload".

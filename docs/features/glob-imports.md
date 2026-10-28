@@ -12,7 +12,7 @@ Disponível no Turbopack do Next 16.4.3 (não existe com webpack). Os tipos vêm
 
 ## Onde no código
 
-- `apps/catalog/content/guides/*.md`: três guias (`caring-for-your-order`, `choosing-a-product`, `returns`). A primeira linha `# Título` é o título; os blocos seguintes, separados por linha em branco, são parágrafos.
+- `apps/catalog/content/guides/*.md`: três guias em português (`caring-for-your-order`, `choosing-a-product`, `returns`; os nomes de arquivo, que viram o slug, ficaram em inglês). Não há versão em inglês: `/catalog/en/guides` mostra o mesmo texto com a interface em inglês. A primeira linha `# Título` é o título; os blocos seguintes, separados por linha em branco, são parágrafos.
 - `apps/catalog/next.config.ts`: `turbopack.rules['*.md'] = { condition: { query: '?raw' }, type: 'text' }`. Só imports de `.md` com `?raw` viram módulo de texto (export `default` com o conteúdo).
 - `apps/catalog/lib/guides.ts`: `import.meta.glob<{ default: string }>('../content/guides/*.md', { eager: true, query: '?raw' })`, mais `guides` (lista) e `getGuide(slug)`.
 - `apps/catalog/app/catalog/[lang]/guides/page.tsx`: lista os guias com `<Link>` para `/catalog/<lang>/guides/<slug>`. O `<h1>` é "Guias" em pt e "Guides" em en (o `zones.spec` depende dele).
@@ -29,4 +29,4 @@ Disponível no Turbopack do Next 16.4.3 (não existe com webpack). Os tipos vêm
 1. `pnpm prod` e abra `http://localhost:3000/catalog/pt/guides`: três itens, na ordem das chaves do glob (`caring-for-your-order`, `choosing-a-product`, `returns`).
 2. Crie `apps/catalog/content/guides/zz-test.md` com `# Teste` e rode `pnpm --filter catalog dev`: o item novo aparece sem mudar código. Apague depois.
 3. `curl -s -o /dev/null -w '%{http_code}' http://localhost:3000/catalog/pt/guides/nope` → `404`.
-4. `e2e/instant.spec.ts` › "guides list comes from markdown files" (abre o primeiro guia e confere o título "Caring for your order") e "unknown guide is 404".
+4. `e2e/instant.spec.ts` › "guides list comes from markdown files" (abre o primeiro guia e confere o título "Cuidando do seu pedido") e "unknown guide is 404".

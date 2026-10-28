@@ -2,6 +2,13 @@ import type { DatabaseSync } from "node:sqlite";
 
 const PRODUCT_COUNT = 12;
 const AUTHORS = ["Marina", "Paulo", "Joana", "Rui"];
+const REVIEW_TEXTS = [
+  "Chegou rápido e bem embalado.",
+  "Bom custo-benefício pelo preço.",
+  "Faz exatamente o que a descrição promete.",
+  "Compraria de novo sem pensar.",
+  "Acabamento melhor do que eu esperava.",
+];
 
 export function seed(db: DatabaseSync): void {
   const addProduct = db.prepare(
@@ -32,7 +39,7 @@ export function seed(db: DatabaseSync): void {
       addReview.run(
         id,
         AUTHORS[r % AUTHORS.length],
-        `Review ${r + 1} of product ${id}`,
+        REVIEW_TEXTS[(id + r) % REVIEW_TEXTS.length],
         3 + ((id + r) % 3),
       );
     }
@@ -49,6 +56,6 @@ export function seed(db: DatabaseSync): void {
     [3, "Carla"],
   ] as const) {
     addUser.run(id, name);
-    addNotification.run(id, `Welcome, ${name}!`, now);
+    addNotification.run(id, `Olá, ${name}! Boas-vindas à Lab Store.`, now);
   }
 }

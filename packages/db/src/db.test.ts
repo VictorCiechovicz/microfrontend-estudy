@@ -46,6 +46,12 @@ test("placeOrder decrements stock, clears cart and notifies", () => {
   expect(unreadCount(1)).toBe(2);
 });
 
+test("cart and order lines use the Portuguese product name", () => {
+  addToCart(1, 3, 1);
+  expect(getCart(1)).toMatchObject([{ productId: 3, name: "Produto 3" }]);
+  expect(placeOrder(1).lines).toMatchObject([{ name: "Produto 3" }]);
+});
+
 test("addToCart clamps a line at 99 units", () => {
   addToCart(1, 3, 60);
   addToCart(1, 3, 60);

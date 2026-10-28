@@ -121,7 +121,7 @@ test("guides list comes from markdown files", async ({ page }) => {
   await guides.first().getByRole("link").click();
   await expect(page).toHaveURL("/catalog/pt/guides/caring-for-your-order");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Caring for your order",
+    "Cuidando do seu pedido",
   );
 });
 

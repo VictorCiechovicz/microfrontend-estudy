@@ -71,7 +71,7 @@ export function placeOrder(userId: number): Order {
     db.prepare("DELETE FROM cart_items WHERE user_id = ?").run(userId);
     db.prepare(
       "INSERT INTO notifications (user_id, text, read, created_at) VALUES (?, ?, 0, ?)",
-    ).run(userId, `Order #${orderId} placed`, createdAt);
+    ).run(userId, `Pedido #${orderId} realizado`, createdAt);
     db.exec("COMMIT");
     return { id: orderId, userId, totalCents, createdAt, lines };
   } catch (error) {

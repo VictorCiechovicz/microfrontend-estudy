@@ -30,7 +30,7 @@ Trocar um pelo outro quebra os dois testes: `refresh()` no perfil re-renderiza c
 
 ## Como observar
 
-1. `pnpm prod`, entre como Ana e abra `http://localhost:3000/account/notifications`. O header mostra o badge com "1" (a notificação de boas-vindas do seed).
+1. `pnpm prod`, entre como Ana e abra `http://localhost:3000/account/notifications`. O header mostra o badge com "1" (a notificação de boas-vindas do seed, "Olá, Ana! Boas-vindas à Lab Store.").
 2. Clique em "Marcar como lida": o badge vira "0" e a notificação passa a mostrar "Lida", sem recarregar.
-3. `e2e/account.spec.ts` › "marking notification read updates header badge (refresh)". O teste lê o número atual e espera um a menos, para não depender de outros testes que criam notificações (um pedido gera "Order #N placed"). Com o banco recém-resetado, é 1 → 0.
+3. `e2e/account.spec.ts` › "marking notification read updates header badge (refresh)". O teste lê o número atual e espera um a menos, para não depender de outros testes que criam notificações (um pedido gera "Pedido #N realizado"). Com o banco recém-resetado, é 1 → 0.
 4. Para ver falhar: apague o `refresh()` de `markReadAction`. A action roda, o banco muda, mas a tela não: o teste falha com `Expected: "0"`, `Received: "1"` (conferido).

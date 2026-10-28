@@ -1,5 +1,5 @@
-# Returns
+# Devoluções
 
-You can return any product within thirty days of delivery.
+Você pode devolver qualquer produto em até trinta dias depois da entrega.
 
-Open your order in the account area and pick the items you want to send back.
+Abra o pedido na área da conta e escolha os itens que quer mandar de volta.

@@ -7,7 +7,7 @@ export function getCart(userId: number): CartLine[] {
       `SELECT c.product_id, t.name, p.price_cents, c.qty
        FROM cart_items c
        JOIN products p ON p.id = c.product_id
-       JOIN product_translations t ON t.product_id = p.id AND t.lang = 'en'
+       JOIN product_translations t ON t.product_id = p.id AND t.lang = 'pt'
        WHERE c.user_id = ?
        ORDER BY c.product_id`,
     )

@@ -1,5 +1,5 @@
-# Caring for your order
+# Cuidando do seu pedido
 
-Keep the packaging until you have checked every item against your order in the account area.
+Guarde a embalagem até conferir cada item com o pedido na área da conta.
 
-If something is missing, the order history shows exactly what was placed and when.
+Se faltar alguma coisa, o histórico de pedidos mostra exatamente o que foi comprado e quando.

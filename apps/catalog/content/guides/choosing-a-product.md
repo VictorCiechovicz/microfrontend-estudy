@@ -1,5 +1,5 @@
-# Choosing a product
+# Como escolher um produto
 
-Start from the catalog list and open a product to see its description, price and current stock.
+Comece pela lista do catálogo e abra um produto para ver a descrição, o preço e o estoque atual.
 
-Reviews from other customers load right after the page opens, so the product details never wait for them.
+As avaliações de outros clientes carregam logo depois que a página abre, então os detalhes do produto nunca esperam por elas.
