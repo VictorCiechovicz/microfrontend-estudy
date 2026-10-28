@@ -1,12 +1,39 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": [
+    "LAB_INTERNAL_SECRET",
+    "LAB_LATENCY_MS",
+    "LAB_DB_PATH",
+    "SHELL_URL"
+  ],
   "tasks": {
-    "dev": { "persistent": true, "cache": false },
-    "start": { "persistent": true, "cache": false },
+    "dev": {
+      "persistent": true,
+      "cache": false,
+      "passThroughEnv": [
+        "CATALOG_URL",
+        "ACCOUNT_URL",
+        "NEXT_PUBLIC_WIDGETS_URL"
+      ]
+    },
+    "start": {
+      "persistent": true,
+      "cache": false,
+      "passThroughEnv": [
+        "CATALOG_URL",
+        "ACCOUNT_URL",
+        "NEXT_PUBLIC_WIDGETS_URL"
+      ]
+    },
     "build": {
       "dependsOn": ["^build"],
       "cache": false,
-      "env": ["EXPOSE_TESTING_API"],
+      "env": [
+        "EXPOSE_TESTING_API",
+        "CATALOG_URL",
+        "ACCOUNT_URL",
+        "NEXT_PUBLIC_WIDGETS_URL"
+      ],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "test": {},

@@ -2,7 +2,9 @@ import { pluginModuleFederation } from "@module-federation/rsbuild-plugin";
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 
-const SHELL_URL = "http://localhost:3000";
+const SHELL_URL = process.env.SHELL_URL || "http://localhost:3000";
+const WIDGETS_URL =
+  process.env.NEXT_PUBLIC_WIDGETS_URL || "http://localhost:3003";
 
 export default defineConfig({
   plugins: [
@@ -39,6 +41,6 @@ export default defineConfig({
     },
   },
   output: {
-    assetPrefix: "http://localhost:3003/",
+    assetPrefix: `${WIDGETS_URL.replace(/\/$/, "")}/`,
   },
 });

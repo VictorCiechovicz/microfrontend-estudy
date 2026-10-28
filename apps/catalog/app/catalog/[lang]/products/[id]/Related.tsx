@@ -4,7 +4,7 @@ import { currentLang, t } from "../../../../../lib/i18n";
 
 export async function Related({ id }: { id: number }) {
   const lang = await currentLang();
-  const products = await getRelatedProducts(id);
+  const products = await getRelatedProducts(id, lang);
   return (
     <section aria-labelledby="related-heading">
       <h2 id="related-heading">{await t("related")}</h2>

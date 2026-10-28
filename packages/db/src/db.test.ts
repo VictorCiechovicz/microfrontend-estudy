@@ -13,6 +13,7 @@ import {
   listProducts,
   placeOrder,
   resetDb,
+  setPrice,
   unreadCount,
 } from "./index.ts";
 import { isLang } from "./langs.ts";
@@ -86,4 +87,17 @@ test("getRecommendations names products in the requested language", () => {
     expect(product.name).toBe(`Produto ${product.id}`);
   }
   expect(getRecommendations(5)[0]?.name).toMatch(/^Product \d+$/);
+});
+
+test("a fresh database file is seeded on first open", () => {
+  closeDb();
+  process.env.LAB_DB_PATH = join(dir, "fresh", "fresh.sqlite");
+  expect(listProducts("en")).toHaveLength(12);
+  expect(getProduct(1, "pt")?.name).toBe("Produto 1");
+});
+
+test("resetDb still restores the seed after changes", () => {
+  setPrice(1, 99);
+  resetDb();
+  expect(getProduct(1, "en")?.priceCents).toBe(1100);
 });

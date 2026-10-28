@@ -6,7 +6,7 @@ import { currentLang, t } from "../../../../../lib/i18n";
 export async function Popular() {
   await prefetch();
   const lang = await currentLang();
-  const products = await getPopularProducts();
+  const products = await getPopularProducts(lang);
   return (
     <section aria-labelledby="popular-heading">
       <h2 id="popular-heading">{await t("popular")}</h2>

@@ -20,7 +20,7 @@ A checagem de conectividade é um `HEAD` na URL atual com header RSC, cancelado 
 
 ## API do carrinho
 
-Criada nesta tarefa porque o teste offline precisa encher o carrinho; o catálogo e o widget consomem na Task 11.
+Existe porque o teste offline precisa encher o carrinho; o catálogo e o widget de carrinho também a consomem.
 
 - `GET /account/api/cart` → `{ lines: CartLine[]; totalCents: number }`.
 - `POST` com `{ productId, qty }` (`productId` inteiro positivo de produto existente, `qty` inteiro de 1 a 99) → mesmo formato. Cada linha do carrinho fica limitada a 99 unidades no próprio SQL de `addToCart` (`MIN(qty + excluded.qty, 99)`, constante `MAX_LINE_QTY` de `@lab/db`), para qualquer chamador. Sem esse limite, dois `POST` com `qty` = `Number.MAX_SAFE_INTEGER` estouravam o inteiro do SQLite e toda leitura do carrinho passava a lançar no `node:sqlite` ("Value is too large to be represented as a JavaScript number"), virando 500 permanente.

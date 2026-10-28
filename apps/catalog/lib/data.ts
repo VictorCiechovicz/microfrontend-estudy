@@ -35,11 +35,14 @@ export async function getProductStock(id: number): Promise<number> {
   return withLatency(() => getStock(id));
 }
 
-export async function getRelatedProducts(id: number): Promise<Product[]> {
+export async function getRelatedProducts(
+  id: number,
+  lang: Lang,
+): Promise<Product[]> {
   "use cache";
   cacheTag(tags.productRankings());
   cacheLife("hours");
-  return withLatency(() => getRecommendations(id));
+  return withLatency(() => getRecommendations(id, 4, lang));
 }
 
 export async function getRecommendedProducts(
@@ -52,11 +55,11 @@ export async function getRecommendedProducts(
   return withLatency(() => getRecommendations(excludeId, 4, lang));
 }
 
-export async function getPopularProducts(): Promise<Product[]> {
+export async function getPopularProducts(lang: Lang): Promise<Product[]> {
   "use cache";
   cacheTag(tags.productRankings());
   cacheLife("hours");
-  return withLatency(() => getRecommendations(undefined, 3));
+  return withLatency(() => getRecommendations(undefined, 3, lang));
 }
 
 export async function getUnreadCount(userId: number): Promise<number> {

@@ -13,7 +13,7 @@
 - `apps/catalog/app/catalog/[lang]/products/[id]/StockErrorBoundary.tsx` (`'use client'`): `catchError(StockFallback)`. O fallback mostra a mensagem e um `Button` de `@lab/ui` que chama `retry()`.
 - Como o fallback é Client Component, ele não pode chamar `t()` (que usa `next/root-params`). A página traduz no servidor e passa `message={await t('stockUnavailable')}` e `retryLabel={await t('retry')}` como props, que o `catchError` repassa ao fallback.
 - `products/[id]/page.tsx`: `<StockErrorBoundary><Suspense><StockBlock/></Suspense></StockErrorBoundary>`. Só o bloco de estoque cai; nome, preço e avaliações continuam na tela.
-- `apps/catalog/app/catalog/api/lab/faults/route.ts`: `POST /catalog/api/lab/faults` com `{ "key": "stock", "count": n }` (n inteiro positivo) chama `injectFault`; qualquer outro corpo → `400`. Só para demo e e2e.
+- `apps/catalog/app/catalog/api/lab/faults/route.ts`: `POST /catalog/api/lab/faults` com `{ "key": "stock", "count": n }` (n inteiro de 1 a 100; acima disso responde 400) chama `injectFault`; qualquer outro corpo → `400`. Só para demo e e2e.
 
 ## Comportamento observado
 

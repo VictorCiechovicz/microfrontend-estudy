@@ -16,7 +16,7 @@ Next 16.4.3. Assinatura instalada: `refresh(): void`. Só pode ser chamado dentr
 - `apps/account/app/notifications/page.tsx`: lista sem cache (também atrás de `connection()`), com um botão "Mark as read" por notificação não lida (`markReadAction.bind(null, id)`).
 - `apps/account/app/notifications/actions.ts` › `markReadAction(id)`: `markNotificationRead`, `refresh()` e broadcast de `user:<id>:notifications`.
 
-Na conta, quem atualiza o badge é o `refresh()`: a contagem não está em cache, então basta re-renderizar. O broadcast continua necessário para o catálogo, onde o badge será cacheado com `cacheTag(tags.userNotifications(id))` (Task 12) e só o `revalidateTag` do endpoint interno o derruba.
+Na conta, quem atualiza o badge é o `refresh()`: a contagem não está em cache, então basta re-renderizar. O broadcast continua necessário para o catálogo, onde o badge é cacheado com `cacheTag(tags.userNotifications(id))` e só o `revalidateTag` do endpoint interno o derruba.
 
 ## `refresh()` vs `updateTag()`
 

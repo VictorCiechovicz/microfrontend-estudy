@@ -2,6 +2,7 @@ import { existsSync, mkdirSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { createSchema } from "./schema.ts";
+import { seed } from "./seed-data.ts";
 
 const DEFAULT_DB_PATH = ".data/lab.sqlite";
 
@@ -29,7 +30,7 @@ export function resolveDbPath(): string {
   const configured = process.env.LAB_DB_PATH || DEFAULT_DB_PATH;
   return isAbsolute(configured)
     ? configured
-    : join(findRoot(process.cwd()), configured);
+    : join(/*turbopackIgnore: true*/ findRoot(process.cwd()), configured);
 }
 
 let current: { path: string; db: DatabaseSync } | null = null;
@@ -43,8 +44,28 @@ export function getDb(): DatabaseSync {
   db.exec("PRAGMA busy_timeout = 5000");
   db.exec("PRAGMA journal_mode = WAL");
   createSchema(db);
+  seedIfEmpty(db);
   current = { path, db };
   return db;
+}
+
+function seedIfEmpty(db: DatabaseSync): void {
+  if (productCount(db) > 0) return;
+  db.exec("BEGIN IMMEDIATE");
+  try {
+    if (productCount(db) === 0) seed(db);
+    db.exec("COMMIT");
+  } catch (error) {
+    db.exec("ROLLBACK");
+    throw error;
+  }
+}
+
+function productCount(db: DatabaseSync): number {
+  const row = db.prepare("SELECT COUNT(*) AS n FROM products").get() as {
+    n: number;
+  };
+  return row.n;
 }
 
 export function closeDb(): void {

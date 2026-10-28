@@ -20,7 +20,7 @@ Com `partialPrefetching: true`, um `<Link>` comum não busca mais a rota inteira
 
 ## Desvio: `<Suspense>` em volta do corpo da página de produto
 
-Até a Task 8 a página lia `await params` fora de `<Suspense>`. No `next dev` isso gera um Instant Insight ("Next.js encountered URL data outside of Suspense", `app/catalog/[lang]/products/[id]/page.tsx (25:29)`), porque um `<Link>` sem `prefetch` (os links de "Relacionados", por exemplo) não teria nada da página no App Shell e a navegação travaria. O corpo foi movido para um componente `Product` dentro de `<Suspense>`, que é a correção "Stream" proposta pelo próprio insight. O `<main>` ficou fora, envolvendo também o `<Suspense>` de "Populares". O mesmo foi feito em `guides/[slug]/page.tsx`. Os ids de `generateStaticParams` continuam com o `<h1>` no HTML estático.
+Antes a página lia `await params` fora de `<Suspense>`. No `next dev` isso gera um Instant Insight ("Next.js encountered URL data outside of Suspense", `app/catalog/[lang]/products/[id]/page.tsx (25:29)`), porque um `<Link>` sem `prefetch` (os links de "Relacionados", por exemplo) não teria nada da página no App Shell e a navegação travaria. O corpo foi movido para um componente `Product` dentro de `<Suspense>`, que é a correção "Stream" proposta pelo próprio insight. O `<main>` ficou fora, envolvendo também o `<Suspense>` de "Populares". O mesmo foi feito em `guides/[slug]/page.tsx`. Os ids de `generateStaticParams` continuam com o `<h1>` no HTML estático.
 
 ## Como observar
 

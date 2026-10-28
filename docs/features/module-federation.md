@@ -25,17 +25,16 @@ A URL do remote vem de `NEXT_PUBLIC_WIDGETS_URL`, com default `http://localhost:
 |---|---|---|
 | `@lab/mf-host` | `RemoteWidget` e os tipos `WidgetName`, `WidgetProps`, `RemoteWidgetProps` | qualquer lugar. O arquivo tem `"use client"`, então um Server Component recebe uma referência de cliente, que é o que se quer para um componente |
 | `@lab/mf-host/runtime` | `getFederation()` | só em Client Components. Importada por um Server Component, o build falha com `You're importing a component that imports react-dom/client. It only works in a Client Component...` |
-| `@lab/mf-host/strategy` | `MF_STRATEGY` | qualquer lugar. Num Server Component chega o valor (`"shared"`), não uma referência de cliente |
 
-Antes, `getFederation` e `MF_STRATEGY` saíam do entry `"use client"`. Um Server Component que importasse `MF_STRATEGY` recebia uma referência de cliente no lugar da string. Por isso a constante foi para um módulo sem diretiva e sem dependência de React.
+`getFederation` fica fora do entry `"use client"` de propósito: importado de lá por um Server Component, viraria uma referência de cliente. Por isso tem a entrada própria `/runtime`.
 
 Os nomes e as props aceitos ficam em `WidgetProps`: `HelloWidget` e `CartWidget` sem props, `Recommendations` com `{ excludeId?: number; lang?: 'pt' | 'en' }`. As props passam do Server Component para o Client Component, então precisam ser serializáveis.
 
-## Estratégia escolhida: `shared` (`MF_STRATEGY = 'shared'`)
+## Estratégia escolhida: `shared`
 
 O host registra o React que o Next empacotou (`lib: () => React`, `version: React.version`, `singleton: true`, `requiredVersion: false`) e o remote declara os mesmos pacotes como `singleton`. Os pacotes compartilhados são `react`, `react/jsx-runtime`, `react/jsx-dev-runtime`, `react-dom` e `react-dom/client`. O widget roda dentro da árvore React da zona: hooks, contexto e Suspense são os do host.
 
-Até a Task 11 só `react`, `react-dom` e `react-dom/client` eram compartilhados, e a afirmação de que "o React do remote não é executado" estava errada: o JSX compilado do widget importa `react/jsx-runtime`, que não estava no `shared` e por isso ia empacotado no chunk do widget, na versão 19.3.1 do remote, e era avaliado no navegador. Funcionava porque o `jsx-runtime` de produção do React 19 não importa o `react` (só monta objetos com `Symbol.for('react.transitional.element')`, que o React do host reconhece), mas era código do React do remote rodando na página. Agora o `jsx-runtime` também vem do host. O `jsx-dev-runtime` entra no `shared` para o modo dev, em que o Rsbuild compila o JSX com `jsxDEV`.
+Antes só `react`, `react-dom` e `react-dom/client` eram compartilhados, e a afirmação de que "o React do remote não é executado" estava errada: o JSX compilado do widget importa `react/jsx-runtime`, que não estava no `shared` e por isso ia empacotado no chunk do widget, na versão 19.3.1 do remote, e era avaliado no navegador. Funcionava porque o `jsx-runtime` de produção do React 19 não importa o `react` (só monta objetos com `Symbol.for('react.transitional.element')`, que o React do host reconhece), mas era código do React do remote rodando na página. Agora o `jsx-runtime` também vem do host. O `jsx-dev-runtime` entra no `shared` para o modo dev, em que o Rsbuild compila o JSX com `jsxDEV`.
 
 O teste `widget runs on the host's React, JSX runtime included` (`e2e/mf-spike.spec.ts`) lê `window.__FEDERATION__.__SHARE__` e confere duas coisas: `react`, `react-dom/client` e `react/jsx-runtime` têm uma entrada do `lab_host` com `useIn: ['widgets']`, e nenhuma entrada registrada pelo `widgets` tem `loaded: true`, ou seja, nenhuma fábrica de React do remote foi chamada. Antes da mudança ele falhava porque não existia entrada `react/jsx-runtime` do host.
 
@@ -43,7 +42,7 @@ Os chunks do React do remote ainda são baixados: o manifest lista os chunks dos
 
 Limitação: com host em produção e remote em dev (ou o contrário), o `jsx-dev-runtime` compartilhado é o do host. O de produção exporta `jsxDEV` como `undefined`, e um remote em dev quebraria. `pnpm dev` e `pnpm prod` sobem tudo no mesmo modo, então isso só acontece misturando os comandos à mão.
 
-Cada módulo exposto exporta também `mount(el, props)` (`apps/widgets/src/mount.tsx`), para o caso de um dia o host precisar trocar para a estratégia `mount`.
+Cada módulo exposto exporta também `mount(el, props)` (`apps/widgets/src/mount.tsx`), como saída documentada para a estratégia `mount`. O `RemoteWidget` não tem esse caminho: ele foi provado no spike e não foi mantido, então não existe chave para alternar entre as estratégias.
 
 ### O que falhou na primeira tentativa de `shared`
 
@@ -111,7 +110,7 @@ O `next` do login da conta é relativo ao `basePath` (`/orders` volta para `/acc
 
 ### API de recomendações
 
-`GET /catalog/api/recommendations?lang=<lang>&exclude=<id>` (`apps/catalog/app/catalog/api/recommendations/route.ts`) devolve `{ products: { id, name, priceCents, href }[] }` com 4 produtos, nomes no idioma pedido e `href` `/catalog/<lang>/products/<id>`. Usa o `getRecommendedProducts(lang, excludeId)` de `lib/data.ts` (cacheado com a tag `products`), então a mesma invalidação que atualiza o bloco "Relacionados" atualiza o widget. O `getRecommendations` do `@lab/db` ganhou o parâmetro `lang` (default `en`, o comportamento de antes para os blocos "Relacionados" e "Populares"). `lang` ausente vale `pt`; `lang` fora de `pt`/`en` responde 400. `exclude` ausente não exclui nada; `exclude` que não é inteiro não negativo responde 400.
+`GET /catalog/api/recommendations?lang=<lang>&exclude=<id>` (`apps/catalog/app/catalog/api/recommendations/route.ts`) devolve `{ products: { id, name, priceCents, href }[] }` com 4 produtos, nomes no idioma pedido e `href` `/catalog/<lang>/products/<id>`. Usa o `getRecommendedProducts(lang, excludeId)` de `lib/data.ts` (cacheado com a tag `products`), enquanto "Relacionados" e "Populares" usam `products:rankings`. São tags diferentes, e o `setPriceAction` invalida as duas, então a mesma ação atualiza o widget e os blocos. O `getRecommendations` do `@lab/db` ganhou o parâmetro `lang` (default `en`; os blocos "Relacionados" e "Populares" também passam o idioma da página). `lang` ausente vale `pt`; `lang` fora de `pt`/`en` responde 400. `exclude` ausente não exclui nada; `exclude` que não é inteiro não negativo responde 400.
 
 ## Remote standalone
 
@@ -140,7 +139,7 @@ Verificação manual: `pnpm --filter catalog dev` com a :3003 parada, abrindo `/
 
 - `shared` inclui `react-dom/client` no remote e no host (ver erro #527 acima).
 - `experiments: { asyncStartup: true }` no remote, para o entry standalone.
-- `@lab/mf-host/src/index.ts` tem `"use client"` e exporta só o `RemoteWidget`; `getFederation` e `MF_STRATEGY` têm entradas próprias (`/runtime`, `/strategy`).
+- `@lab/mf-host/src/index.ts` tem `"use client"` e exporta só o `RemoteWidget`; `getFederation` tem entrada própria (`/runtime`).
 - `react/jsx-runtime` e `react/jsx-dev-runtime` também são compartilhados.
 - `RemoteWidget` tem error boundary e volta ao estado de carregamento quando `name` muda.
 - O `HelloWidget` usa `useState` para guardar o texto. A saída é a mesma do plano, mas assim o teste do spike falharia se o widget rodasse com outra cópia do React (o hook quebra fora do React que está renderizando); sem hook, um React duplicado passaria despercebido.

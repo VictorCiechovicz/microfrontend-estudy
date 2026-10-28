@@ -69,6 +69,29 @@ test("faults endpoint rejects an invalid body", async ({ request }) => {
   expect(response.status()).toBe(400);
 });
 
+test("faults endpoint caps the count at 100", async ({ request }) => {
+  const response = await request.post("/catalog/api/lab/faults", {
+    data: { key: "stock", count: 101 },
+  });
+  expect(response.status()).toBe(400);
+});
+
+test("related and popular blocks follow the page language", async ({
+  page,
+}) => {
+  await page.goto("/catalog/pt/products/1");
+  const related = page.getByRole("region", { name: "Relacionados" });
+  const popular = page.getByRole("region", { name: "Populares" });
+  await expect(related.getByRole("link").first()).toHaveText(/^Produto \d+$/);
+  await expect(popular.getByRole("link").first()).toHaveText(/^Produto \d+$/);
+  for (const link of await related.getByRole("link").all()) {
+    await expect(link).toHaveText(/^Produto \d+$/);
+  }
+  for (const link of await popular.getByRole("link").all()) {
+    await expect(link).toHaveText(/^Produto \d+$/);
+  }
+});
+
 test("opengraph image is generated", async ({ request }) => {
   const response = await request.get("/catalog/pt/products/1/opengraph-image");
   expect(response.status()).toBe(200);
