@@ -13,6 +13,11 @@ test("shell blocks a zone endpoint leaking through /account/internal", async ({
   expect(res.status()).toBe(404);
 });
 
+test("shell blocks bare /account/internal", async ({ request }) => {
+  const res = await request.get("http://localhost:3000/account/internal");
+  expect(res.status()).toBe(404);
+});
+
 test("shell own endpoint is reachable but protected by the secret", async ({
   request,
 }) => {

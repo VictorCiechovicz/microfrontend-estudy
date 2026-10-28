@@ -7,5 +7,5 @@ export const ZONE_REVALIDATE_URLS: Record<ZoneName, string> = {
 };
 
 export function internalSecret(): string {
-  return process.env.LAB_INTERNAL_SECRET ?? "lab-dev-secret";
+  return process.env.LAB_INTERNAL_SECRET || "lab-dev-secret";
 }

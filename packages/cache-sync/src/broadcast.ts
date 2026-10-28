@@ -20,6 +20,7 @@ export async function broadcastInvalidation(
         body: JSON.stringify({ tags }),
         signal: AbortSignal.timeout(2000),
       });
+      await res.body?.cancel();
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
     }),
   );
