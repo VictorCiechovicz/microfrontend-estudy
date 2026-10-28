@@ -1,0 +1,4 @@
+{
+  "extends": "@lab/tsconfig/library.json",
+  "include": ["src", "rsbuild.config.ts"]
+}

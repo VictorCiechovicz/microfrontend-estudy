@@ -1,3 +1,4 @@
+import { RemoteWidget } from "@lab/mf-host";
 import Link from "next/link";
 
 export default async function CatalogPage({
@@ -12,6 +13,7 @@ export default async function CatalogPage({
       <nav>
         <Link href={`/catalog/${lang}/guides`}>Guides</Link>
       </nav>
+      <RemoteWidget name="HelloWidget" />
     </main>
   );
 }
