@@ -1,0 +1,18 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #d0d7de;
+}
+
+.nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.slots {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

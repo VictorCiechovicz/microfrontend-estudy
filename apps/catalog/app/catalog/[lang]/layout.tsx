@@ -1,3 +1,4 @@
+import { SiteFooter, SiteHeader } from "@lab/ui";
 import type { ReactNode } from "react";
 
 export function generateStaticParams() {
@@ -14,7 +15,11 @@ export default async function CatalogLayout({
   const { lang } = await params;
   return (
     <html lang={lang} data-zone="catalog">
-      <body>{children}</body>
+      <body>
+        <SiteHeader zone="catalog" />
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

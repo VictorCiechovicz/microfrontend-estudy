@@ -27,7 +27,7 @@ test("cross-zone link is a hard navigation", async ({ page }) => {
   await page.evaluate(() => {
     window.__marker = 1;
   });
-  await page.getByRole("link", { name: "Catalog" }).click();
+  await page.getByRole("main").getByRole("link", { name: "Catalog" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-zone", "catalog");
   expect(await page.evaluate(() => window.__marker)).toBeUndefined();
 });

@@ -4,6 +4,7 @@
   "compilerOptions": {
     "jsx": "preserve",
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "incremental": true,
     "plugins": [{ "name": "next" }]
   }

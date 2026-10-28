@@ -1,9 +1,14 @@
+import { SiteFooter, SiteHeader } from "@lab/ui";
 import type { ReactNode } from "react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-zone="shell">
-      <body>{children}</body>
+      <body>
+        <SiteHeader zone="shell" />
+        {children}
+        <SiteFooter />
+      </body>
     </html>
   );
 }

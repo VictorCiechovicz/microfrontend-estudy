@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   basePath: "/account",
-  transpilePackages: ["@lab/cache-sync"],
+  transpilePackages: ["@lab/ui", "@lab/db", "@lab/cache-sync", "@lab/mf-host"],
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {

@@ -1,0 +1,18 @@
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary {
+  background: #1f6feb;
+  color: #fff;
+}
+
+.ghost {
+  background: transparent;
+  color: #1f6feb;
+  border-color: #1f6feb;
+}
