@@ -1,7 +1,7 @@
 import { prefetch } from "next/cache";
 import Link from "next/link";
 import { getPopularProducts } from "../../../../../lib/data";
-import { currentLang } from "../../../../../lib/i18n";
+import { currentLang, t } from "../../../../../lib/i18n";
 
 export async function Popular() {
   await prefetch();
@@ -9,7 +9,7 @@ export async function Popular() {
   const products = await getPopularProducts();
   return (
     <section aria-labelledby="popular-heading">
-      <h2 id="popular-heading">Popular</h2>
+      <h2 id="popular-heading">{await t("popular")}</h2>
       <ul>
         {products.map((product) => (
           <li key={product.id}>

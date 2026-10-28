@@ -21,14 +21,14 @@ function parseId(value: string): number | null {
 
 type Params = Promise<{ lang: string; id: string }>;
 
-export default function ProductPage({ params }: { params: Params }) {
+export default async function ProductPage({ params }: { params: Params }) {
   return (
     <SlideTransition>
       <main>
         <Suspense fallback={<p aria-busy="true">…</p>}>
           <Product params={params} />
         </Suspense>
-        <Suspense fallback={<p>Loading popular…</p>}>
+        <Suspense fallback={<p>{await t("loadingPopular")}</p>}>
           <Popular />
         </Suspense>
       </main>
@@ -64,7 +64,7 @@ async function Product({ params }: { params: Params }) {
             <StockBlock id={product.id} />
           </Suspense>
         </StockErrorBoundary>
-        <Suspense fallback={<p>Loading related…</p>}>
+        <Suspense fallback={<p>{await t("loadingRelated")}</p>}>
           <Related id={product.id} />
         </Suspense>
       </ReviewsJump>

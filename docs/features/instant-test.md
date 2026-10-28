@@ -30,8 +30,8 @@ O brief usa `getByRole('link', { name: /Produto 2/ })`. Com 12 produtos no seed,
 
 ## Onde no código
 
-- `e2e/instant.spec.ts`: "product title is instant, reviews stream after navigation" (link com `prefetch`; dentro do `instant`: `<h1>` com "Produto 2", regiões "Related" e "Popular" visíveis, "Carregando avaliações…" visível, zero `review`; depois do escopo: as avaliações aparecem).
-- `e2e/instant.spec.ts`: "popular block is out of the App Shell a default link loads" (link comum de "Related"; dentro do `instant` só existe o App Shell: "Loading popular…" visível, região "Popular" ausente). Ver `navigation-prefetch.md`.
+- `e2e/instant.spec.ts`: "product title is instant, reviews stream after navigation" (link com `prefetch`; dentro do `instant`: `<h1>` com "Produto 2", regiões "Relacionados" e "Populares" visíveis, "Carregando avaliações…" visível, zero `review`; depois do escopo: as avaliações aparecem).
+- `e2e/instant.spec.ts`: "popular block is out of the App Shell a default link loads" (link comum de "Relacionados"; dentro do `instant` só existe o App Shell: "Carregando populares…" visível, região "Populares" ausente). Ver `navigation-prefetch.md`.
 
 ## DevTools do `next dev` (conferido com `pnpm --filter catalog dev`)
 
