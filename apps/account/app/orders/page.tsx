@@ -32,8 +32,7 @@ async function Cart() {
         <ul>
           {lines.map((line) => (
             <li key={line.productId}>
-              {line.qty} × {line.name}{" "}
-              <Price cents={line.priceCents} lang="en" />
+              {line.qty} × {line.name} <Price cents={line.priceCents} />
             </li>
           ))}
         </ul>
@@ -57,7 +56,7 @@ async function OrderHistory() {
           {orders.map((order) => (
             <li key={order.id} data-testid="order-row">
               <Link href={`/orders/${order.id}`}>Order #{order.id}</Link>{" "}
-              <Price cents={order.totalCents} lang="en" />
+              <Price cents={order.totalCents} />
             </li>
           ))}
         </ul>

@@ -4,6 +4,7 @@ import {
   type CartLine,
   getCart,
   getProduct,
+  MAX_LINE_QTY,
   removeFromCart,
 } from "@lab/db";
 import { revalidateTag } from "next/cache";
@@ -55,7 +56,9 @@ export async function POST(request: Request) {
   const { productId, qty } = body as { productId?: unknown; qty?: unknown };
   const id = parseProductId(productId);
   if (id === null) return badRequest("invalid productId");
-  if (!isPositiveInt(qty)) return badRequest("invalid qty");
+  if (!isPositiveInt(qty) || qty > MAX_LINE_QTY) {
+    return badRequest("invalid qty");
+  }
   addToCart(userId, id, qty);
   await invalidateCart(userId);
   return cartOf(userId);

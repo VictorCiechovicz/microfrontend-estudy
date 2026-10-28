@@ -21,12 +21,12 @@ export async function OrderDetail({
       <ul>
         {order.lines.map((line) => (
           <li key={line.productId}>
-            {line.qty} × {line.name} <Price cents={line.priceCents} lang="en" />
+            {line.qty} × {line.name} <Price cents={line.priceCents} />
           </li>
         ))}
       </ul>
       <p>
-        Total <Price cents={order.totalCents} lang="en" />
+        Total <Price cents={order.totalCents} />
       </p>
     </article>
   );

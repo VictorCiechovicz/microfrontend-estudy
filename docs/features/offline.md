@@ -14,7 +14,7 @@ A checagem de conectividade é um `HEAD` na URL atual com header RSC, cancelado 
 
 - `apps/account/next.config.ts`: `experimental.useOffline: true`.
 - `apps/account/app/components/OfflineBanner.tsx`: Client Component no layout raiz; com `useOffline()` verdadeiro mostra `role="status"` "You are offline. Pending requests will retry once you are back online."
-- `apps/account/app/components/PlaceOrderButton.tsx`: `useTransition` + `useOffline`. O rótulo é "Place order"; pendente, "Placing order…"; pendente e offline, "Placing order (offline, will retry)…". O resultado da action vira um `role="status"` ("Order #N placed" ou "Cart is empty").
+- `apps/account/app/components/PlaceOrderButton.tsx`: `useTransition` + `useOffline`. O rótulo é "Place order"; pendente, "Placing order…"; pendente e offline, "Placing order (offline, will retry)…". O resultado da action vira um `role="status"` ("Order #N placed" ou "Cart is empty"); se a action lançar, o botão mostra "Could not place the order. Try again." em vez de cair na página de erro.
 - `apps/account/app/orders/page.tsx`: o botão fica na seção "Cart", acima do histórico.
 - `apps/account/app/api/cart/route.ts`: `GET`/`POST`/`DELETE /account/api/cart`, usado pelo teste para pôr o produto 8 no carrinho (ver abaixo).
 
@@ -23,10 +23,10 @@ A checagem de conectividade é um `HEAD` na URL atual com header RSC, cancelado 
 Criada nesta tarefa porque o teste offline precisa encher o carrinho; o catálogo e o widget consomem na Task 11.
 
 - `GET /account/api/cart` → `{ lines: CartLine[]; totalCents: number }`.
-- `POST` com `{ productId, qty }` (inteiros positivos, produto existente) → mesmo formato.
+- `POST` com `{ productId, qty }` (`productId` inteiro positivo de produto existente, `qty` inteiro de 1 a 99) → mesmo formato. Cada linha do carrinho fica limitada a 99 unidades no próprio SQL de `addToCart` (`MIN(qty + excluded.qty, 99)`, constante `MAX_LINE_QTY` de `@lab/db`), para qualquer chamador. Sem esse limite, dois `POST` com `qty` = `Number.MAX_SAFE_INTEGER` estouravam o inteiro do SQLite e toda leitura do carrinho passava a lançar no `node:sqlite` ("Value is too large to be represented as a JavaScript number"), virando 500 permanente.
 - `DELETE ?productId=` → mesmo formato.
 - Sem sessão válida (sem cookie, cookie malformado ou usuário inexistente): **401** `{ error: 'unauthenticated' }`, nunca redirect (o `proxy.ts` da conta não cobre `/api/*`).
-- Entrada inválida (JSON quebrado, id/qty não inteiro ou ≤ 0, produto inexistente): **400** `{ error }`.
+- Entrada inválida (JSON quebrado, id/qty não inteiro ou ≤ 0, `qty` > 99, produto inexistente): **400** `{ error }`.
 - `POST` e `DELETE` chamam `revalidateTag(tags.userCart(id), { expire: 0 })` e `broadcastInvalidation([tags.userCart(id)], { from: 'account' })`.
 
 ## Como observar

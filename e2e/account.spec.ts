@@ -78,7 +78,17 @@ test("order detail opens as modal from list and as page on reload", async ({
     /^Order #\d+$/,
   );
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Orders");
+  await expect(dialog).toContainText("R$");
 
+  await page
+    .getByRole("banner")
+    .getByRole("link", { name: /unread notifications/ })
+    .dispatchEvent("click");
+  await expect(page).toHaveURL("/account/notifications");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+
+  await page.goBack();
+  await expect(page.getByRole("dialog")).toBeVisible();
   await page.reload();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
@@ -214,6 +224,8 @@ test.describe("cart API", () => {
       { productId: 9999, qty: 1 },
       { productId: 1, qty: 0 },
       { productId: 1, qty: -2 },
+      { productId: 1, qty: 100 },
+      { productId: 1, qty: 1e6 },
     ]) {
       const response = await page.request.post("/account/api/cart", { data });
       expect(response.status(), JSON.stringify(data)).toBe(400);

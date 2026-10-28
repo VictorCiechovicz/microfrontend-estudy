@@ -44,6 +44,18 @@ test("placeOrder decrements stock, clears cart and notifies", () => {
   expect(unreadCount(1)).toBe(2);
 });
 
+test("addToCart clamps a line at 99 units", () => {
+  addToCart(1, 3, 60);
+  addToCart(1, 3, 60);
+  expect(getCart(1)).toMatchObject([{ productId: 3, qty: 99 }]);
+  addToCart(1, 4, Number.MAX_SAFE_INTEGER);
+  addToCart(1, 4, Number.MAX_SAFE_INTEGER);
+  expect(getCart(1)).toMatchObject([
+    { productId: 3, qty: 99 },
+    { productId: 4, qty: 99 },
+  ]);
+});
+
 test("placeOrder on empty cart throws", () => {
   expect(() => placeOrder(2)).toThrow("Cart is empty");
 });

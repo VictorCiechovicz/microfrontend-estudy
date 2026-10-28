@@ -25,11 +25,13 @@ export function getCart(userId: number): CartLine[] {
   }));
 }
 
+export const MAX_LINE_QTY = 99;
+
 export function addToCart(userId: number, productId: number, qty = 1): void {
   getDb()
     .prepare(
-      `INSERT INTO cart_items (user_id, product_id, qty) VALUES (?, ?, ?)
-       ON CONFLICT(user_id, product_id) DO UPDATE SET qty = qty + excluded.qty`,
+      `INSERT INTO cart_items (user_id, product_id, qty) VALUES (?, ?, MIN(?, ${MAX_LINE_QTY}))
+       ON CONFLICT(user_id, product_id) DO UPDATE SET qty = MIN(qty + excluded.qty, ${MAX_LINE_QTY})`,
     )
     .run(userId, productId, qty);
 }

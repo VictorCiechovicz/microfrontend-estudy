@@ -12,10 +12,14 @@ export function PlaceOrderButton() {
 
   function placeOrder() {
     startTransition(async () => {
-      const result = await placeOrderAction();
-      setMessage(
-        "error" in result ? result.error : `Order #${result.orderId} placed`,
-      );
+      try {
+        const result = await placeOrderAction();
+        setMessage(
+          "error" in result ? result.error : `Order #${result.orderId} placed`,
+        );
+      } catch {
+        setMessage("Could not place the order. Try again.");
+      }
     });
   }
 

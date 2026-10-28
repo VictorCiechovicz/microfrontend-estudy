@@ -2,7 +2,12 @@ export { closeDb, getDb } from "./client.ts";
 export { injectFault } from "./faults.ts";
 export { LANGS } from "./langs.ts";
 export { withLatency } from "./latency.ts";
-export { addToCart, getCart, removeFromCart } from "./repos/cart.ts";
+export {
+  addToCart,
+  getCart,
+  MAX_LINE_QTY,
+  removeFromCart,
+} from "./repos/cart.ts";
 export {
   listNotifications,
   markNotificationRead,
