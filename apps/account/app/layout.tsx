@@ -1,3 +1,4 @@
+import { RemoteWidget } from "@lab/mf-host";
 import { SiteFooter, SiteHeader } from "@lab/ui";
 import { type ReactNode, Suspense } from "react";
 import { NotificationBadge } from "./components/NotificationBadge";
@@ -16,6 +17,7 @@ export default function RootLayout({
       <body>
         <SiteHeader
           zone="account"
+          cartSlot={<RemoteWidget name="CartWidget" />}
           userSlot={
             <>
               <Suspense fallback={null}>

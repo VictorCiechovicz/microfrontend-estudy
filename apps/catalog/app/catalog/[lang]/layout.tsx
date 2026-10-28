@@ -1,3 +1,4 @@
+import { RemoteWidget } from "@lab/mf-host";
 import { SiteFooter, SiteHeader } from "@lab/ui";
 import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
@@ -25,6 +26,7 @@ export default async function CatalogLayout({
       <body>
         <SiteHeader
           zone="catalog"
+          cartSlot={<RemoteWidget name="CartWidget" />}
           userSlot={
             <Suspense fallback={null}>
               <UserSlot />

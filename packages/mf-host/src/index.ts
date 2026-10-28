@@ -4,5 +4,5 @@ export {
   RemoteWidget,
   type RemoteWidgetProps,
   type WidgetName,
+  type WidgetProps,
 } from "./RemoteWidget";
-export { getFederation, MF_STRATEGY } from "./runtime";

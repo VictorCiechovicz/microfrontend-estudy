@@ -15,6 +15,8 @@ const MESSAGES = {
     inStock: "{n} em estoque",
     retry: "Tentar de novo",
     stockUnavailable: "Estoque indisponível",
+    addToCart: "Adicionar ao carrinho",
+    addToCartFailed: "Não foi possível adicionar ao carrinho",
   },
   en: {
     catalog: "Catalog",
@@ -28,6 +30,8 @@ const MESSAGES = {
     inStock: "{n} in stock",
     retry: "Try again",
     stockUnavailable: "Stock unavailable",
+    addToCart: "Add to cart",
+    addToCartFailed: "Could not add to cart",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

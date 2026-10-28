@@ -2,6 +2,8 @@ import { pluginModuleFederation } from "@module-federation/rsbuild-plugin";
 import { defineConfig } from "@rsbuild/core";
 import { pluginReact } from "@rsbuild/plugin-react";
 
+const SHELL_URL = "http://localhost:3000";
+
 export default defineConfig({
   plugins: [
     pluginReact(),
@@ -9,9 +11,13 @@ export default defineConfig({
       name: "widgets",
       exposes: {
         "./HelloWidget": "./src/HelloWidget.tsx",
+        "./CartWidget": "./src/CartWidget.tsx",
+        "./Recommendations": "./src/Recommendations.tsx",
       },
       shared: {
         react: { singleton: true, requiredVersion: false },
+        "react/jsx-runtime": { singleton: true, requiredVersion: false },
+        "react/jsx-dev-runtime": { singleton: true, requiredVersion: false },
         "react-dom": { singleton: true, requiredVersion: false },
         "react-dom/client": { singleton: true, requiredVersion: false },
       },
@@ -27,6 +33,10 @@ export default defineConfig({
   server: {
     port: 3003,
     headers: { "Access-Control-Allow-Origin": "*" },
+    proxy: {
+      "/account/api": SHELL_URL,
+      "/catalog/api": SHELL_URL,
+    },
   },
   output: {
     assetPrefix: "http://localhost:3003/",

@@ -34,7 +34,7 @@ export async function getProductStock(id: number): Promise<number> {
   return withLatency(() => getStock(id));
 }
 
-export async function getRelatedProducts(id: number): Promise<Product[]> {
+export async function getRelatedProducts(id?: number): Promise<Product[]> {
   "use cache";
   cacheTag(tags.products());
   cacheLife("hours");

@@ -1,9 +1,11 @@
+import { RemoteWidget } from "@lab/mf-host";
 import { Price } from "@lab/ui";
 import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
 import { getProductDetail } from "../../../../../lib/data";
 import { currentLang, t } from "../../../../../lib/i18n";
 import { SlideTransition } from "../../SlideTransition";
+import { AddToCart } from "./AddToCart";
 import { Popular } from "./Popular";
 import { Related } from "./Related";
 import { Reviews } from "./Reviews";
@@ -48,6 +50,11 @@ async function Product({ params }: { params: Params }) {
       </ViewTransition>
       <p>{product.description}</p>
       <Price cents={product.priceCents} lang={lang} />
+      <AddToCart
+        productId={product.id}
+        label={await t("addToCart")}
+        failedLabel={await t("addToCartFailed")}
+      />
       <ReviewsJump
         label={await t("seeReviews")}
         reviews={
@@ -68,6 +75,7 @@ async function Product({ params }: { params: Params }) {
           <Related id={product.id} />
         </Suspense>
       </ReviewsJump>
+      <RemoteWidget name="Recommendations" props={{ excludeId: product.id }} />
     </>
   );
 }
