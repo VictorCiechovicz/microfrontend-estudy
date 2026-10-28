@@ -57,3 +57,49 @@ test("login and internal endpoints stay reachable without a session", async ({
   );
   expect(internal.status()).toBe(401);
 });
+
+for (const value of ["999", "abc", "1.0"]) {
+  test(`stale or malformed session cookie "${value}" counts as logged out`, async ({
+    page,
+    context,
+  }) => {
+    await context.addCookies([
+      { name: "lab_user", value, url: "http://localhost:3000" },
+    ]);
+    await page.goto("/account/orders");
+    await expect(page).toHaveURL(/\/account\/login(\?next=%2Forders)?$/);
+    await expect(page.getByTestId("user-name")).toHaveCount(0);
+
+    await page.goto("/catalog/pt");
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: "Log in" }),
+    ).toBeVisible();
+    await expect(page.getByTestId("user-name")).toHaveCount(0);
+  });
+}
+
+test("login rejects a next target with control characters", async ({
+  page,
+}) => {
+  await page.goto("/account/login?next=%2F%09%2Fevil.example");
+  await page.getByLabel("Ana").check();
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page).toHaveURL("/account");
+});
+
+test("login with an unknown user keeps the next target", async ({ page }) => {
+  await page.goto("/account/orders");
+  await page.waitForLoadState("networkidle");
+  await page.getByLabel("Ana").evaluate((radio: HTMLInputElement) => {
+    radio.value = "999";
+  });
+  await page.getByLabel("Ana").check();
+  const action = page.waitForResponse((r) => r.request().method() === "POST");
+  await page.getByRole("button", { name: "Log in" }).click();
+  await action;
+  await expect(page).toHaveURL(/\/account\/login\?next=%2Forders$/);
+  await expect(page.getByTestId("user-name")).toHaveCount(0);
+  expect(
+    (await page.context().cookies()).some((c) => c.name === "lab_user"),
+  ).toBe(false);
+});

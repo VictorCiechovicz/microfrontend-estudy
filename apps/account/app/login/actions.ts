@@ -9,18 +9,20 @@ function safeNext(value: FormDataEntryValue | null): string {
   if (typeof value !== "string") return "/";
   if (!value.startsWith("/") || value.startsWith("//")) return "/";
   if (value.includes("\\")) return "/";
+  if ([...value].some((char) => char.charCodeAt(0) < 0x20)) return "/";
   return value;
 }
 
 export async function login(formData: FormData): Promise<void> {
+  const next = safeNext(formData.get("next"));
   const user = getUser(Number(formData.get("userId")));
-  if (!user) redirect("/login");
+  if (!user) redirect(`/login?${new URLSearchParams({ next })}`);
   (await cookies()).set(SESSION_COOKIE, String(user.id), {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
   });
-  redirect(safeNext(formData.get("next")));
+  redirect(next);
 }
 
 export async function logout(): Promise<void> {
