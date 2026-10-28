@@ -1,0 +1,123 @@
+.note {
+  position: relative;
+  border: 1px solid var(--lab-study-border, #ead9a8);
+  border-left: 4px solid var(--lab-study, #a16207);
+  border-radius: var(--lab-radius, 10px);
+  background: var(--lab-study-soft, #fffaeb);
+  color: var(--lab-text, #1c2230);
+  font-size: var(--lab-text-sm, 0.875rem);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary:focus-visible {
+  outline: 2px solid var(--lab-study, #a16207);
+  outline-offset: -2px;
+  border-radius: var(--lab-radius, 10px);
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--lab-study, #a16207);
+  color: #fff;
+  flex: none;
+}
+
+.icon svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.title {
+  font-family: var(--lab-mono, monospace);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lab-study, #a16207);
+}
+
+.chevron {
+  margin-left: auto;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--lab-study, #a16207);
+  border-bottom: 2px solid var(--lab-study, #a16207);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 140ms;
+}
+
+.note:not([open]) .chevron {
+  transform: rotate(-45deg);
+}
+
+.body {
+  padding: 0 0.95rem 0.2rem 3rem;
+  line-height: 1.6;
+}
+
+.body p {
+  margin: 0 0 0.6rem;
+}
+
+.body code {
+  padding: 0.05rem 0.3rem;
+  border-radius: 4px;
+  background: rgb(161 98 7 / 0.1);
+  font-size: 0.85em;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin: 0;
+  padding: 0.6rem 0.95rem 0.75rem 3rem;
+  border-top: 1px dashed var(--lab-study-border, #ead9a8);
+}
+
+.linksLabel {
+  color: var(--lab-text-muted, #5b6475);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 600;
+}
+
+.links a {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--lab-study-border, #ead9a8);
+  border-radius: 999px;
+  background: var(--lab-surface, #fff);
+  color: var(--lab-study, #a16207);
+  font-size: var(--lab-text-xs, 0.75rem);
+  font-weight: 600;
+}
+
+.links a:hover {
+  border-color: var(--lab-study, #a16207);
+  text-decoration: none;
+}
+
+.links a::after {
+  content: " →";
+}

@@ -1,4 +1,4 @@
-import { EmptyState, PageHeader, Price, Skeleton } from "@lab/ui";
+import { EmptyState, PageHeader, Price, Skeleton, StudyNote } from "@lab/ui";
 import { navigation } from "next/cache";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -23,6 +23,32 @@ export default function OrdersPage() {
         title="Pedidos"
         lead="Revise o carrinho, faça o pedido e acompanhe o histórico."
       />
+      <StudyNote
+        className={styles.studyNote}
+        notes={[
+          {
+            slug: "navigation-prefetch",
+            hash: "navigation-na-conta-histórico-de-pedidos",
+          },
+          "update-tag",
+          "offline",
+          "parallel-routes",
+        ]}
+      >
+        <p>
+          Aqui o <code>navigation()</code> tem efeito: volte para Minha conta e
+          clique em Pedidos. Título e carrinho aparecem na hora (vieram no
+          prefetch) e o histórico mostra "Carregando pedidos…" até a navegação
+          trazê-lo.
+        </p>
+        <p>
+          Fazer pedido chama <code>updateTag</code> de pedidos, carrinho e
+          notificações e avisa shell e catálogo: o aviso no canto lista as tags
+          e o resultado de cada zona. Com DevTools › Network › Offline, o pedido
+          fica pendente (<code>useOffline</code>) e conclui sozinho quando a
+          rede volta.
+        </p>
+      </StudyNote>
       <div className={styles.ordersLayout}>
         <Suspense
           fallback={

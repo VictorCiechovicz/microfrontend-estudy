@@ -51,6 +51,8 @@ const MESSAGES = {
     errorLabHowTo:
       "Rode o catálogo com pnpm dev e volte a esta página para ver os botões.",
     notFoundTitle: "Página não encontrada",
+    studyNoteTitle: "O que observar aqui",
+    studyNotesLabel: "Notas",
   },
   en: {
     catalog: "Catalog",
@@ -100,6 +102,8 @@ const MESSAGES = {
     errorLabHowTo:
       "Run the catalog with pnpm dev and come back to this page to see the buttons.",
     notFoundTitle: "Page not found",
+    studyNoteTitle: "What to look at here",
+    studyNotesLabel: "Notes (pt)",
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

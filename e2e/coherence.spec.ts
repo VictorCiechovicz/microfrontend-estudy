@@ -189,7 +189,11 @@ test.describe("price admin", () => {
     ]) {
       await page.goto(`/catalog/${lang}/admin`);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(heading);
-      await expect(page.getByRole("main").getByRole("link")).toHaveText(login);
+      const mainLinks = page
+        .getByRole("main")
+        .getByRole("link")
+        .and(page.locator(":not([data-study-note] a)"));
+      await expect(mainLinks).toHaveText(login);
       await expect(page.getByRole("main").getByRole("textbox")).toHaveCount(0);
     }
   });

@@ -2,6 +2,7 @@ import { Card, PageHeader, Skeleton } from "@lab/ui";
 import { Suspense } from "react";
 import { currentLang, t } from "../../../../lib/i18n";
 import { getSessionUserId } from "../../../../lib/session";
+import { CatalogStudyNote } from "../../../components/CatalogStudyNote";
 import styles from "../catalog.module.css";
 import { PriceForm } from "./PriceForm";
 
@@ -13,6 +14,29 @@ export default async function AdminPage() {
         title={await t("priceAdmin")}
         lead={await t("adminLead")}
       />
+      <CatalogStudyNote
+        notes={[
+          {
+            slug: "cross-zone-cache",
+            hash: "stale-while-revalidate-no-catálogo",
+          },
+          "update-tag",
+        ]}
+      >
+        <p>
+          Ponha um produto no carrinho, mude o preço dele aqui e leia o aviso de
+          cache no canto: <code>revalidateTag(product:&lt;id&gt;, 'max')</code>,{" "}
+          <code>revalidateTag(products:rankings, 'max')</code> e{" "}
+          <code>updateTag(products)</code>.
+        </p>
+        <p>
+          A lista do catálogo mostra o preço novo na hora (
+          <code>updateTag</code>); a página do produto serve o preço antigo na
+          primeira visita e o novo depois (stale-while-revalidate). Shell e
+          conta recebem o broadcast, e em <code>/account/orders</code> o total
+          do carrinho já reflete o preço.
+        </p>
+      </CatalogStudyNote>
       <Suspense fallback={<Skeleton label="…" />}>
         <AdminGate />
       </Suspense>

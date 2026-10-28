@@ -30,7 +30,9 @@ test("product title is instant, reviews stream after navigation", async ({
       page.getByRole("region", { name: "Relacionados" }),
     ).toBeVisible();
     await expect(page.getByRole("region", { name: "Populares" })).toBeVisible();
-    await expect(page.getByText("Carregando avaliações…")).toBeVisible();
+    await expect(
+      page.getByText("Carregando avaliações…", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByTestId("review")).toHaveCount(0);
   });
   await expect(page.getByTestId("review").first()).toBeVisible();
@@ -52,7 +54,9 @@ test("popular block is out of the App Shell a default link loads", async ({
   await instant(page, async () => {
     await target.click();
     await page.waitForURL((url) => url.pathname !== "/catalog/pt/products/2");
-    await expect(page.getByText("Carregando populares…")).toBeVisible();
+    await expect(
+      page.getByText("Carregando populares…", { exact: true }),
+    ).toBeVisible();
     await expect(page.getByRole("region", { name: "Populares" })).toHaveCount(
       0,
     );

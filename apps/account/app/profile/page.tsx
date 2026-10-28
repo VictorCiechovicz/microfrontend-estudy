@@ -1,4 +1,4 @@
-import { Card, PageHeader, Skeleton } from "@lab/ui";
+import { Card, PageHeader, Skeleton, StudyNote } from "@lab/ui";
 import Link from "next/link";
 import { Suspense } from "react";
 import { getProfile } from "../../lib/data";
@@ -17,6 +17,17 @@ export default function ProfilePage() {
         title="Perfil"
         lead="Ao salvar, o novo nome aparece no header desta zona na hora e no catálogo na próxima visita."
       />
+      <StudyNote className={styles.studyNote} notes={["update-tag"]}>
+        <p>
+          Salvar chama <code>updateTag(user:&lt;id&gt;:profile)</code>: a
+          re-renderização devolvida pela Server Action já lê o nome novo, e o
+          header muda sem recarregar.
+        </p>
+        <p>
+          Shell e catálogo recebem o broadcast da tag, mas hoje nenhum dos dois
+          a guarda em cache: o catálogo lê o nome direto do banco.
+        </p>
+      </StudyNote>
       <Card className={styles.formCard}>
         <Suspense fallback={<Skeleton label="Carregando perfil…" />}>
           <ProfileForm />

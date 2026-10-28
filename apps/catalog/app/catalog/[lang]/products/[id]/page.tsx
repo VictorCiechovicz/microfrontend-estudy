@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Suspense, ViewTransition } from "react";
 import { getProductDetail } from "../../../../../lib/data";
 import { currentLang, t } from "../../../../../lib/i18n";
+import { CatalogStudyNote } from "../../../../components/CatalogStudyNote";
 import { ProductTile } from "../../../../components/ProductTile";
 import { SlideTransition } from "../../SlideTransition";
 import { AddToCart } from "./AddToCart";
@@ -86,6 +87,36 @@ async function Product({ params }: { params: Params }) {
           <Suspense fallback={<Skeleton label={await t("loadingReviews")} />}>
             <Reviews id={product.id} />
           </Suspense>
+        }
+        study={
+          <CatalogStudyNote
+            className=""
+            notes={[
+              "cache-components",
+              "catch-error",
+              "navigation-prefetch",
+              "view-transitions",
+              "module-federation",
+            ]}
+          >
+            <p>
+              Nome e preço estão em <code>'use cache'</code> e chegam prontos
+              (prefetch do link ou HTML estático); estoque e avaliações vêm
+              depois, por streaming. O estoque tem um <code>catchError</code>:
+              se o serviço falhar, aparece "Tentar de novo" só nesse bloco.
+            </p>
+            <p>
+              Vindo da lista, o nome desliza até o título (View Transition). Por
+              um link de "Relacionados", que não usa <code>prefetch</code>,
+              "Populares" mostra "Carregando populares…": o{" "}
+              <code>prefetch()</code> tirou o bloco do App Shell.
+            </p>
+            <p>
+              O <code>navigation()</code> das avaliações não muda nada visível
+              aqui, porque o prefetch do catálogo é estático; o efeito aparece
+              em Pedidos, na conta. "Recomendados" vem do app widgets (:3003).
+            </p>
+          </CatalogStudyNote>
         }
       >
         <Suspense fallback={<Skeleton label={await t("loadingRelated")} />}>

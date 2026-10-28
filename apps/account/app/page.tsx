@@ -1,5 +1,5 @@
 import { unreadCount } from "@lab/db";
-import { Card, PageHeader } from "@lab/ui";
+import { Card, PageHeader, StudyNote } from "@lab/ui";
 import Link from "next/link";
 import { connection } from "next/server";
 import { type ReactNode, Suspense } from "react";
@@ -56,6 +56,27 @@ export default function AccountPage() {
           </Stat>
         }
       />
+      <StudyNote
+        className={styles.studyNote}
+        notes={[
+          {
+            slug: "navigation-prefetch",
+            hash: "navigation-na-conta-histórico-de-pedidos",
+          },
+          "partial-prefetching",
+        ]}
+      >
+        <p>
+          O link "Pedidos" usa <code>&lt;Link prefetch&gt;</code>. Com DevTools
+          › Network filtrado por <code>_rsc</code>, veja os prefetches de{" "}
+          <code>/account/orders</code>: sem <code>x-nextjs-prerender</code>,
+          porque esta zona lê o cookie de sessão e renderiza o prefetch na hora.
+        </p>
+        <p>
+          Os contadores dos cartões chegam por streaming, cada um no seu{" "}
+          <code>&lt;Suspense&gt;</code>.
+        </p>
+      </StudyNote>
       <nav aria-label="Conta">
         <ul className={styles.dashboard}>
           <Card as="li" interactive className={styles.tile}>

@@ -9,12 +9,14 @@ export function ReviewsJump({
   summary,
   buy,
   reviews,
+  study,
   children,
 }: {
   label: string;
   summary: ReactNode;
   buy: ReactNode;
   reviews: ReactNode;
+  study?: ReactNode;
   children: ReactNode;
 }) {
   const reviewsRef = useRef<FragmentInstance>(null);
@@ -25,7 +27,10 @@ export function ReviewsJump({
   return (
     <>
       <div className={styles.detail}>
-        <div className={styles.summary}>{summary}</div>
+        <div className={styles.main}>
+          <div className={styles.summary}>{summary}</div>
+          {study}
+        </div>
         <aside className={styles.aside} data-slot="product-aside">
           <div className={styles.buy}>
             {buy}

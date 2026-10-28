@@ -1,5 +1,5 @@
 import { listNotifications } from "@lab/db";
-import { EmptyState, PageHeader, Skeleton } from "@lab/ui";
+import { EmptyState, PageHeader, Skeleton, StudyNote } from "@lab/ui";
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
@@ -23,6 +23,22 @@ export default function NotificationsPage() {
         title="Notificações"
         lead="Marcar uma notificação como lida atualiza o contador do sino no header sem recarregar a página."
       />
+      <StudyNote
+        className={styles.studyNote}
+        notes={["refresh", "cross-zone-cache"]}
+      >
+        <p>
+          Marcar como lida chama <code>refresh()</code>: a lista e o sino da
+          conta são lidos sem cache, então basta re-renderizar a página. O aviso
+          no canto mostra que nenhum cache foi tocado aqui.
+        </p>
+        <p>
+          No catálogo o sino é cacheado com a tag{" "}
+          <code>user:&lt;id&gt;:notifications</code>, por isso a action também
+          faz broadcast dela: abra o catálogo em seguida e a contagem já está
+          certa.
+        </p>
+      </StudyNote>
       <Suspense fallback={<Skeleton label="Carregando notificações…" />}>
         <NotificationList />
       </Suspense>
