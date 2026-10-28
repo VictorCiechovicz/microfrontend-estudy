@@ -6,16 +6,27 @@ type RecommendationsBody = {
   products: { id: number; name: string; priceCents: number; href: string }[];
 };
 
-export type RecommendationsProps = { excludeId?: number };
+type Lang = "pt" | "en";
 
-export default function Recommendations({ excludeId }: RecommendationsProps) {
+export type RecommendationsProps = { excludeId?: number; lang?: Lang };
+
+const HEADINGS: Record<Lang, string> = {
+  pt: "Recomendados",
+  en: "Recommended",
+};
+
+export default function Recommendations({
+  excludeId,
+  lang = "pt",
+}: RecommendationsProps) {
   const headingId = useId();
   const [body, setBody] = useState<RecommendationsBody | null>(null);
 
   useEffect(() => {
     let active = true;
-    const query = excludeId === undefined ? "" : `?exclude=${excludeId}`;
-    fetch(`/catalog/api/recommendations${query}`, {
+    const query = new URLSearchParams({ lang });
+    if (excludeId !== undefined) query.set("exclude", String(excludeId));
+    fetch(`/catalog/api/recommendations?${query}`, {
       credentials: "same-origin",
     })
       .then((response) => (response.ok ? response.json() : null))
@@ -26,17 +37,17 @@ export default function Recommendations({ excludeId }: RecommendationsProps) {
     return () => {
       active = false;
     };
-  }, [excludeId]);
+  }, [excludeId, lang]);
 
   if (body === null) return null;
   return (
     <section aria-labelledby={headingId}>
-      <h2 id={headingId}>Recommended</h2>
+      <h2 id={headingId}>{HEADINGS[lang]}</h2>
       <ul>
         {body.products.map((product) => (
           <li key={product.id}>
             <a href={product.href}>{product.name}</a>{" "}
-            <Price cents={product.priceCents} />
+            <Price cents={product.priceCents} lang={lang} />
           </li>
         ))}
       </ul>

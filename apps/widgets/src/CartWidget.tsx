@@ -25,6 +25,7 @@ export default function CartWidget() {
     let disposed = false;
     let latest = 0;
     let shown: number | null = null;
+    let dispatched: Event | null = null;
 
     async function load() {
       const request = ++latest;
@@ -34,17 +35,15 @@ export default function CartWidget() {
       shown = next;
       setCount(next);
       if (changed && next !== null) {
-        window.dispatchEvent(
-          new CustomEvent<CartChangedDetail>(CART_CHANGED, {
-            detail: { count: next },
-          }),
-        );
+        dispatched = new CustomEvent<CartChangedDetail>(CART_CHANGED, {
+          detail: { count: next },
+        });
+        window.dispatchEvent(dispatched);
       }
     }
 
     function onCartChanged(event: Event) {
-      const { detail } = event as CustomEvent<CartChangedDetail | null>;
-      if (detail?.count !== shown) void load();
+      if (event !== dispatched) void load();
     }
 
     window.addEventListener(CART_CHANGED, onCartChanged);

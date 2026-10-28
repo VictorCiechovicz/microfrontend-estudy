@@ -66,11 +66,12 @@ export function setPrice(productId: number, priceCents: number): void {
 export function getRecommendations(
   excludeProductId?: number,
   limit = 4,
+  lang: Lang = "en",
 ): Product[] {
   const rows = getDb()
     .prepare(
       `${SELECT} WHERE p.id != ? ORDER BY p.price_cents DESC, p.id LIMIT ?`,
     )
-    .all("en", excludeProductId ?? -1, limit) as ProductRow[];
+    .all(lang, excludeProductId ?? -1, limit) as ProductRow[];
   return rows.map(toProduct);
 }

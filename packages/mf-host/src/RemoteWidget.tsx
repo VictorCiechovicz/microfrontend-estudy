@@ -12,7 +12,7 @@ import { getFederation } from "./runtime";
 export type WidgetProps = {
   HelloWidget: Record<string, never>;
   CartWidget: Record<string, never>;
-  Recommendations: { excludeId?: number };
+  Recommendations: { excludeId?: number; lang?: "pt" | "en" };
 };
 
 export type WidgetName = keyof WidgetProps;

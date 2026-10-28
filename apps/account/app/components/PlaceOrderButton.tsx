@@ -14,8 +14,13 @@ export function PlaceOrderButton() {
     startTransition(async () => {
       try {
         const result = await placeOrderAction();
-        setMessage(
-          "error" in result ? result.error : `Order #${result.orderId} placed`,
+        if ("error" in result) {
+          setMessage(result.error);
+          return;
+        }
+        setMessage(`Order #${result.orderId} placed`);
+        window.dispatchEvent(
+          new CustomEvent("lab:cart-changed", { detail: { count: 0 } }),
         );
       } catch {
         setMessage("Could not place the order. Try again.");

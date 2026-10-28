@@ -66,9 +66,14 @@ test("order detail opens as modal from list and as page on reload", async ({
   await loginAsAna(page);
   await putInCart(page, OFFLINE_PRODUCT_ID);
   await page.goto("/account/orders");
+  const cartBadge = page
+    .getByRole("banner")
+    .getByRole("status", { name: /in cart/ });
+  await expect(cartBadge).toHaveText(/^[1-9]\d*$/);
   await page.getByRole("button", { name: "Place order" }).click();
   const row = page.getByTestId("order-row").first();
   await expect(row).toBeVisible();
+  await expect(cartBadge).toHaveText("0");
 
   await row.getByRole("link").click();
   await expect(page).toHaveURL(/\/account\/orders\/\d+$/);

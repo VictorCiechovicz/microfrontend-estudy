@@ -75,7 +75,10 @@ async function Product({ params }: { params: Params }) {
           <Related id={product.id} />
         </Suspense>
       </ReviewsJump>
-      <RemoteWidget name="Recommendations" props={{ excludeId: product.id }} />
+      <RemoteWidget
+        name="Recommendations"
+        props={{ excludeId: product.id, lang }}
+      />
     </>
   );
 }

@@ -73,18 +73,44 @@ test("cart widget refetches when another part of the page announces a change", a
   await expect(cartBadge(page)).toHaveText("2");
 });
 
-test("recommendations list four other products", async ({ page }) => {
-  await page.goto(PRODUCT_PATH);
-  const block = page.getByRole("region", { name: "Recommended" });
-  const links = block.getByRole("link");
-  await expect(links).toHaveCount(4);
-  for (const href of await links.evaluateAll((as) =>
-    as.map((a) => a.getAttribute("href")),
-  )) {
-    expect(href).toMatch(/^\/catalog\/pt\/products\/\d+$/);
-    expect(href).not.toBe(PRODUCT_PATH);
-  }
+test("cart widget refetches even when the announced count matches its own", async ({
+  page,
+}) => {
+  await loginAsCarla(page);
+  await emptyCart(page);
+  await page.goto("/account");
+  await expect(cartBadge(page)).toHaveText("0");
+
+  const added = await page.request.post("/account/api/cart", {
+    data: { productId: WIDGETS_PRODUCT_ID, qty: 3 },
+  });
+  expect(added.status()).toBe(200);
+  await page.evaluate(() =>
+    window.dispatchEvent(
+      new CustomEvent("lab:cart-changed", { detail: { count: 0 } }),
+    ),
+  );
+  await expect(cartBadge(page)).toHaveText("3");
 });
+
+for (const { lang, heading, name } of [
+  { lang: "pt", heading: "Recomendados", name: /^Produto \d+$/ },
+  { lang: "en", heading: "Recommended", name: /^Product \d+$/ },
+]) {
+  test(`recommendations list four other products in ${lang}`, async ({
+    page,
+  }) => {
+    await page.goto(`/catalog/${lang}/products/${WIDGETS_PRODUCT_ID}`);
+    const links = page.getByRole("region", { name: heading }).getByRole("link");
+    await expect(links).toHaveCount(4);
+    for (const link of await links.all()) {
+      await expect(link).toHaveText(name);
+      const href = await link.getAttribute("href");
+      expect(href).toMatch(new RegExp(`^/catalog/${lang}/products/\\d+$`));
+      expect(href).not.toBe(`/catalog/${lang}/products/${WIDGETS_PRODUCT_ID}`);
+    }
+  });
+}
 
 test("recommendations API excludes the given product", async ({ request }) => {
   const response = await request.get(
@@ -98,14 +124,30 @@ test("recommendations API excludes the given product", async ({ request }) => {
   for (const product of products) {
     expect(product.id).not.toBe(WIDGETS_PRODUCT_ID);
     expect(product.href).toBe(`/catalog/pt/products/${product.id}`);
-    expect(typeof product.name).toBe("string");
+    expect(product.name).toBe(`Produto ${product.id}`);
     expect(Number.isInteger(product.priceCents)).toBe(true);
   }
-  const invalid = await request.get("/catalog/api/recommendations?exclude=abc");
-  expect(invalid.status()).toBe(400);
+
+  const english = await request.get(
+    `/catalog/api/recommendations?exclude=${WIDGETS_PRODUCT_ID}&lang=en`,
+  );
+  expect(english.status()).toBe(200);
+  for (const product of (
+    (await english.json()) as {
+      products: { id: number; name: string; href: string }[];
+    }
+  ).products) {
+    expect(product.href).toBe(`/catalog/en/products/${product.id}`);
+    expect(product.name).toBe(`Product ${product.id}`);
+  }
+
+  for (const query of ["exclude=abc", "lang=xx"]) {
+    const invalid = await request.get(`/catalog/api/recommendations?${query}`);
+    expect(invalid.status(), query).toBe(400);
+  }
 });
 
-test("logged out: cart API is 401, widget stays quiet, add to cart goes to login", async ({
+test("logged out: cart API is 401, widget stays quiet, add to cart logs in and returns", async ({
   page,
   request,
 }) => {
@@ -121,7 +163,7 @@ test("logged out: cart API is 401, widget stays quiet, add to cart goes to login
   await page.goto(PRODUCT_PATH);
   expect((await widgetCartRequest).status()).toBe(401);
   await expect(
-    page.getByRole("region", { name: "Recommended" }).getByRole("link"),
+    page.getByRole("region", { name: "Recomendados" }).getByRole("link"),
   ).toHaveCount(4);
   await expect(cartBadge(page)).toHaveCount(0);
   await expect(page.getByTestId("widget-fallback")).toHaveCount(0);
@@ -130,6 +172,11 @@ test("logged out: cart API is 401, widget stays quiet, add to cart goes to login
   await expect(page).toHaveURL(
     `/account/login?next=${encodeURIComponent(PRODUCT_PATH)}`,
   );
+  await page.getByLabel("Carla").check();
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page).toHaveURL(PRODUCT_PATH);
+  await expect(page.locator("html")).toHaveAttribute("data-zone", "catalog");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Produto 5");
   expect(errors).toEqual([]);
 });
 

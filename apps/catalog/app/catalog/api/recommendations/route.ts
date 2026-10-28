@@ -1,11 +1,18 @@
-import { getRelatedProducts } from "../../../../lib/data";
+import { isLang } from "@lab/db/langs";
+import { getRecommendedProducts } from "../../../../lib/data";
 
 export async function GET(request: Request) {
-  const exclude = new URL(request.url).searchParams.get("exclude");
+  const params = new URL(request.url).searchParams;
+  const exclude = params.get("exclude");
   if (exclude !== null && !/^\d+$/.test(exclude)) {
     return Response.json({ error: "invalid exclude" }, { status: 400 });
   }
-  const products = await getRelatedProducts(
+  const lang = params.get("lang") ?? "pt";
+  if (!isLang(lang)) {
+    return Response.json({ error: "invalid lang" }, { status: 400 });
+  }
+  const products = await getRecommendedProducts(
+    lang,
     exclude === null ? undefined : Number(exclude),
   );
   return Response.json({
@@ -13,7 +20,7 @@ export async function GET(request: Request) {
       id,
       name,
       priceCents,
-      href: `/catalog/pt/products/${id}`,
+      href: `/catalog/${lang}/products/${id}`,
     })),
   });
 }

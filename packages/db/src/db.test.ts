@@ -7,6 +7,7 @@ import {
   closeDb,
   getCart,
   getProduct,
+  getRecommendations,
   getStock,
   injectFault,
   listProducts,
@@ -75,4 +76,14 @@ test("isLang accepts only supported languages", () => {
   expect(isLang("en")).toBe(true);
   expect(isLang("xx")).toBe(false);
   expect(isLang(undefined)).toBe(false);
+});
+
+test("getRecommendations names products in the requested language", () => {
+  const products = getRecommendations(5, 4, "pt");
+  expect(products).toHaveLength(4);
+  expect(products.map((p) => p.id)).not.toContain(5);
+  for (const product of products) {
+    expect(product.name).toBe(`Produto ${product.id}`);
+  }
+  expect(getRecommendations(5)[0]?.name).toMatch(/^Product \d+$/);
 });

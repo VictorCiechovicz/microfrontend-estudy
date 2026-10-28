@@ -7,7 +7,7 @@ import {
   type Product,
   withLatency,
 } from "@lab/db";
-import { isLang } from "@lab/db/langs";
+import { isLang, type Lang } from "@lab/db/langs";
 import { cacheLife, cacheTag } from "next/cache";
 import { lang } from "next/root-params";
 
@@ -34,11 +34,21 @@ export async function getProductStock(id: number): Promise<number> {
   return withLatency(() => getStock(id));
 }
 
-export async function getRelatedProducts(id?: number): Promise<Product[]> {
+export async function getRelatedProducts(id: number): Promise<Product[]> {
   "use cache";
   cacheTag(tags.products());
   cacheLife("hours");
   return withLatency(() => getRecommendations(id));
+}
+
+export async function getRecommendedProducts(
+  lang: Lang,
+  excludeId?: number,
+): Promise<Product[]> {
+  "use cache";
+  cacheTag(tags.products());
+  cacheLife("hours");
+  return withLatency(() => getRecommendations(excludeId, 4, lang));
 }
 
 export async function getPopularProducts(): Promise<Product[]> {

@@ -29,7 +29,7 @@ A URL do remote vem de `NEXT_PUBLIC_WIDGETS_URL`, com default `http://localhost:
 
 Antes, `getFederation` e `MF_STRATEGY` saíam do entry `"use client"`. Um Server Component que importasse `MF_STRATEGY` recebia uma referência de cliente no lugar da string. Por isso a constante foi para um módulo sem diretiva e sem dependência de React.
 
-Os nomes e as props aceitos ficam em `WidgetProps`: `HelloWidget` e `CartWidget` sem props, `Recommendations` com `{ excludeId?: number }`. As props passam do Server Component para o Client Component, então precisam ser serializáveis.
+Os nomes e as props aceitos ficam em `WidgetProps`: `HelloWidget` e `CartWidget` sem props, `Recommendations` com `{ excludeId?: number; lang?: 'pt' | 'en' }`. As props passam do Server Component para o Client Component, então precisam ser serializáveis.
 
 ## Estratégia escolhida: `shared` (`MF_STRATEGY = 'shared'`)
 
@@ -85,7 +85,7 @@ Os widgets chamam as APIs das zonas pela mesma origem do shell (`/account/api/ca
 | Widget | Props | Dados | Comportamento |
 |---|---|---|---|
 | `CartWidget` | nenhuma | `GET /account/api/cart` | mostra `Cart` + `Badge` do `@lab/ui` com a soma das quantidades (nome acessível `"1 item in cart"`, `"N items in cart"`), link `<a>` para `/account/orders`. Com 401 (deslogado) não renderiza nada |
-| `Recommendations` | `{ excludeId?: number }` | `GET /catalog/api/recommendations?exclude=<id>` | `<section>` "Recommended" com 4 links `<a href>` vindos da API (`/catalog/pt/products/<id>`) |
+| `Recommendations` | `{ excludeId?: number; lang?: 'pt' \| 'en' }` (default `pt`) | `GET /catalog/api/recommendations?lang=<lang>&exclude=<id>` | `<section>` "Recomendados"/"Recommended" com 4 links `<a href>` vindos da API (`/catalog/<lang>/products/<id>`), nomes e preço no idioma da página. A página de produto passa o `lang` do root param |
 
 O mesmo `CartWidget` aparece no header do catálogo e no da conta, e o `e2e/widgets.spec.ts` confere que ele mostra a mesma contagem nas duas zonas.
 
@@ -96,9 +96,10 @@ O widget importa `Badge` e `Price` do `@lab/ui`. O Rsbuild compila o TypeScript 
 `CustomEvent<{ count: number }>` disparado no `window`:
 
 - pelo `AddToCart` do catálogo, depois de um `POST /account/api/cart` com sucesso, com a contagem do carrinho devolvido;
-- pelo `CartWidget`, quando a contagem que ele buscou muda.
+- pelo `CartWidget`, quando a contagem que ele buscou muda;
+- pelo `PlaceOrderButton` da conta, com `count: 0`, depois de um pedido feito (o pedido esvazia o carrinho).
 
-O `CartWidget` refaz o `GET` quando recebe um evento cuja contagem difere da que ele mostra. Essa condição evita o laço: o widget dispara o evento depois de buscar, e o próprio widget (ou outro `CartWidget` na página) recebe uma contagem igual à que já mostra e não busca de novo. Respostas que chegam fora de ordem são descartadas (só vale a última requisição).
+O `CartWidget` refaz o `GET` a cada evento, menos o que ele mesmo acabou de disparar. A contagem do evento não é usada como verdade: ela pode ter saído de uma resposta antiga, e só o `GET` diz o estado atual. O laço fica fechado porque o widget só dispara quando a contagem buscada muda: outro `CartWidget` na página recebe o evento, busca, chega à mesma contagem e não dispara de novo. Respostas que chegam fora de ordem são descartadas (só vale a última requisição).
 
 O nome do evento está repetido em `apps/widgets/src/cart-events.ts` e no `AddToCart`. É um contrato de runtime entre um remote e um host com deploys separados, como uma URL de API, e por isso não virou import entre eles.
 
@@ -106,9 +107,11 @@ O nome do evento está repetido em `apps/widgets/src/cart-events.ts` e no `AddTo
 
 Client Component em `apps/catalog/app/catalog/[lang]/products/[id]/AddToCart.tsx`. Faz `POST /account/api/cart` com `{ productId, qty: 1 }`. Com 401 faz navegação dura para `/account/login?next=<caminho atual>`. Com outro erro mostra a mensagem `addToCartFailed`.
 
+O `next` do login da conta é relativo ao `basePath` (`/orders` volta para `/account/orders`), porque o `redirect()` de uma Server Action resolve dentro do `basePath`. Um `next=/catalog/pt/products/5` caía em `/account/catalog/pt/products/5` (404). Agora `login` (`apps/account/app/login/actions.ts`) mantém as validações do `safeNext` e, quando o caminho é do catálogo (`/catalog` seguido de fim, `/`, `?` ou `#`), redireciona para a URL absoluta no shell, `${SHELL_URL}${next}` (`SHELL_URL` com default `http://localhost:3000`). O navegador sai da zona da conta e carrega a página do catálogo. `/` continua significando a home da conta, porque é o default do formulário e do `safeNext`.
+
 ### API de recomendações
 
-`GET /catalog/api/recommendations?exclude=<id>` (`apps/catalog/app/catalog/api/recommendations/route.ts`) devolve `{ products: { id, name, priceCents, href }[] }` com 4 produtos. Usa o `getRelatedProducts` de `lib/data.ts` (cacheado com a tag `products`), então a mesma invalidação que atualiza o bloco "Relacionados" atualiza o widget. `exclude` ausente não exclui nada; `exclude` que não é inteiro não negativo responde 400. Os nomes vêm em inglês, porque o `getRecommendations` do `@lab/db` consulta `en`.
+`GET /catalog/api/recommendations?lang=<lang>&exclude=<id>` (`apps/catalog/app/catalog/api/recommendations/route.ts`) devolve `{ products: { id, name, priceCents, href }[] }` com 4 produtos, nomes no idioma pedido e `href` `/catalog/<lang>/products/<id>`. Usa o `getRecommendedProducts(lang, excludeId)` de `lib/data.ts` (cacheado com a tag `products`), então a mesma invalidação que atualiza o bloco "Relacionados" atualiza o widget. O `getRecommendations` do `@lab/db` ganhou o parâmetro `lang` (default `en`, o comportamento de antes para os blocos "Relacionados" e "Populares"). `lang` ausente vale `pt`; `lang` fora de `pt`/`en` responde 400. `exclude` ausente não exclui nada; `exclude` que não é inteiro não negativo responde 400.
 
 ## Remote standalone
 

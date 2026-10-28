@@ -13,6 +13,12 @@ function safeNext(value: FormDataEntryValue | null): string {
   return value;
 }
 
+const SHELL_URL = process.env.SHELL_URL ?? "http://localhost:3000";
+
+function isOutsideAccountZone(path: string): boolean {
+  return /^\/catalog(?:[/?#]|$)/.test(path);
+}
+
 export async function login(formData: FormData): Promise<void> {
   const next = safeNext(formData.get("next"));
   const user = getUser(Number(formData.get("userId")));
@@ -22,7 +28,7 @@ export async function login(formData: FormData): Promise<void> {
     httpOnly: true,
     sameSite: "lax",
   });
-  redirect(next);
+  redirect(isOutsideAccountZone(next) ? `${SHELL_URL}${next}` : next);
 }
 
 export async function logout(): Promise<void> {
