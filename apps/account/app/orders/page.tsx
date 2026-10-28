@@ -29,13 +29,24 @@ async function Cart() {
       {lines.length === 0 ? (
         <p>Your cart is empty.</p>
       ) : (
-        <ul>
-          {lines.map((line) => (
-            <li key={line.productId}>
-              {line.qty} × {line.name} <Price cents={line.priceCents} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul>
+            {lines.map((line) => (
+              <li key={line.productId}>
+                {line.qty} × {line.name} <Price cents={line.priceCents} />
+              </li>
+            ))}
+          </ul>
+          <p data-testid="cart-total">
+            Total{" "}
+            <Price
+              cents={lines.reduce(
+                (sum, line) => sum + line.priceCents * line.qty,
+                0,
+              )}
+            />
+          </p>
+        </>
       )}
       <PlaceOrderButton />
     </section>

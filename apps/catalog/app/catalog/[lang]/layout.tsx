@@ -3,6 +3,7 @@ import { SiteFooter, SiteHeader } from "@lab/ui";
 import type { Metadata } from "next";
 import { type ReactNode, Suspense } from "react";
 import { currentLang } from "../../../lib/i18n";
+import { NotificationBadge } from "../../components/NotificationBadge";
 import { UserSlot } from "../../components/UserSlot";
 import "./view-transitions.css";
 
@@ -28,9 +29,14 @@ export default async function CatalogLayout({
           zone="catalog"
           cartSlot={<RemoteWidget name="CartWidget" />}
           userSlot={
-            <Suspense fallback={null}>
-              <UserSlot />
-            </Suspense>
+            <>
+              <Suspense fallback={null}>
+                <NotificationBadge />
+              </Suspense>
+              <Suspense fallback={null}>
+                <UserSlot />
+              </Suspense>
+            </>
           }
         />
         {children}

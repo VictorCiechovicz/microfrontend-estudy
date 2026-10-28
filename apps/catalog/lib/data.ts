@@ -5,6 +5,7 @@ import {
   getStock,
   listProducts,
   type Product,
+  unreadCount,
   withLatency,
 } from "@lab/db";
 import { isLang, type Lang } from "@lab/db/langs";
@@ -56,4 +57,11 @@ export async function getPopularProducts(): Promise<Product[]> {
   cacheTag(tags.products());
   cacheLife("hours");
   return withLatency(() => getRecommendations(undefined, 3));
+}
+
+export async function getUnreadCount(userId: number): Promise<number> {
+  "use cache";
+  cacheTag(tags.userNotifications(userId));
+  cacheLife("hours");
+  return unreadCount(userId);
 }

@@ -35,5 +35,7 @@ export async function getOrder(
 export async function getCartLines(userId: number): Promise<CartLine[]> {
   "use cache";
   cacheTag(tags.userCart(userId));
-  return getCart(userId);
+  const lines = getCart(userId);
+  cacheTag(...lines.map((line) => tags.product(line.productId)));
+  return lines;
 }

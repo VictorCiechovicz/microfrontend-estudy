@@ -49,7 +49,9 @@ async function Product({ params }: { params: Params }) {
         <h1>{product.name}</h1>
       </ViewTransition>
       <p>{product.description}</p>
-      <Price cents={product.priceCents} lang={lang} />
+      <p data-testid="product-price">
+        <Price cents={product.priceCents} lang={lang} />
+      </p>
       <AddToCart
         productId={product.id}
         label={await t("addToCart")}
